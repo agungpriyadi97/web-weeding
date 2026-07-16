@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
     if (isSupabaseConfigured()) {
       const supabaseAdmin = getSupabaseAdmin();
-      
+
       const { error } = await supabaseAdmin.storage
         .from(bucket)
         .upload(fileName, buffer, {
@@ -37,11 +37,45 @@ export async function POST(request: Request) {
         throw error;
       }
 
-      const { data: { publicUrl } } = supabaseAdmin.storage
+      const {
+        data: { publicUrl },
+      } = supabaseAdmin.storage
         .from(bucket)
         .getPublicUrl(fileName);
 
-      return NextResponse.json({ url: publicUrl });
+      // Simpan ke database jika bucket gallery
+      if (bucket === "gallery") {
+        const { error: dbError } = await supabaseAdmin
+          .from("gallery")
+          .insert({
+            image_url: publicUrl,
+            sort_order: 0,
+          });
+
+        if (dbError) {
+          console.error("Insert gallery error:", dbError.message);
+          throw dbError;
+        }
+      }
+
+      // Update wedding_info jika bucket music
+      if (bucket === "music") {
+        const { error: dbError } = await supabaseAdmin
+          .from("wedding_info")
+          .update({
+            music_url: publicUrl,
+          });
+
+        if (dbError) {
+          console.error("Update music error:", dbError.message);
+          throw dbError;
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        url: publicUrl,
+      });
     } else {
       // Local fallback upload
       const uploadDir = path.join(process.cwd(), 'public/uploads', bucket);
@@ -51,7 +85,7 @@ export async function POST(request: Request) {
 
       const filePath = path.join(uploadDir, fileName);
       fs.writeFileSync(filePath, buffer);
-      
+
       const publicPath = `/uploads/${bucket}/${fileName}`;
       return NextResponse.json({ url: publicPath });
     }
