@@ -17,33 +17,36 @@ export default function MusicPlayer({ play, audioUrl }: MusicPlayerProps) {
   const targetAudioUrl = audioUrl || 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
 
   useEffect(() => {
-    // Only run on client
-    if (typeof window !== 'undefined') {
-      audioRef.current = new Audio(targetAudioUrl);
-      audioRef.current.loop = true;
+    if (typeof window === 'undefined') return;
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
+    const audio = new Audio(targetAudioUrl);
+    audio.loop = true;
+    audio.muted = isMuted;
+    audioRef.current = audio;
+
+    if (play) {
+      audio.play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch(err => {
+          console.warn('Play attempt blocked or failed:', err.message);
+          setIsPlaying(false);
+        });
     }
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
+      audio.pause();
+      if (audioRef.current === audio) {
         audioRef.current = null;
       }
     };
-  }, [targetAudioUrl]);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      if (play) {
-        audioRef.current.play()
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch(err => {
-            console.warn('Play attempt blocked or failed:', err.message);
-          });
-      }
-    }
-  }, [play]);
+  }, [targetAudioUrl, play, isMuted]);
 
   const togglePlay = () => {
     if (audioRef.current) {
@@ -54,6 +57,9 @@ export default function MusicPlayer({ play, audioUrl }: MusicPlayerProps) {
         audioRef.current.play()
           .then(() => {
             setIsPlaying(true);
+          })
+          .catch(err => {
+            console.error('Manual play failed:', err);
           });
       }
     }

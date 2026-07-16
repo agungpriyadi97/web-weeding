@@ -58,25 +58,25 @@ Perjalanan kami selama hampir lima tahun tidak selalu berjalan mulus. Kami sempa
 
 ### Mempelai Pria
 
-Ayah: 
-Ibu: 
+Ayah: Rahmat
+Ibu: Juminah
 
 ### Mempelai Wanita
 
-Ayah: 
-Ibu: 
+Ayah: Edi
+Ibu: Asril
 
 ---
 
 ## 🎁 Amplop Digital (Opsional)
 
-Nama Bank: 
+Nama Bank: BCA
 
-Nomor Rekening: 
+Nomor Rekening: 787837828
 
-Nama Pemilik Rekening: 
+Nama Pemilik Rekening: Hery Azinurer
 
-QRIS: 
+QRIS: /uploads/qris/Screenshot_2026_05_19_143142_1784222625589.png
 
 ---
 

@@ -84,7 +84,16 @@ export default function AdminDashboard() {
       setWeddingData(dataJson);
       
       if (dataJson.info) {
-        setInfoForm(dataJson.info);
+        const infoWithDefaults = {
+          enable_music: true,
+          enable_countdown: true,
+          enable_guestbook: true,
+          enable_rsvp: true,
+          enable_gift: true,
+          maintenance_mode: false,
+          ...dataJson.info
+        };
+        setInfoForm(infoWithDefaults);
         setSelectedTheme(dataJson.info.theme || 'elegant-gold');
       }
       
@@ -267,12 +276,12 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteGalleryItem = async (id: string) => {
+  const handleDeleteGalleryItem = async (imageUrl: string) => {
     if (!confirm('Hapus foto ini dari galeri?')) return;
     setSaveStatus('saving');
     try {
       if (weddingData) {
-        const updated = weddingData.gallery.filter(item => item.id !== id);
+        const updated = weddingData.gallery.filter(item => item.image_url !== imageUrl);
         const res = await fetch('/api/wedding-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1149,7 +1158,7 @@ export default function AdminDashboard() {
                       <Eye className="w-4 h-4" />
                     </button>
                     <button 
-                      onClick={() => handleDeleteGalleryItem(item.id || '')}
+                      onClick={() => handleDeleteGalleryItem(item.image_url)}
                       className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />

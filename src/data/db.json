@@ -13,21 +13,28 @@
     "story_proposal": "Tepat di hari perayaan anniversary ketiga kami di bulan Agustus 2023, dia mengajakku liburan singkat ke Bali. Sore itu, di pinggir pantai Jimbaran sambil menunggu matahari terbenam, dia tiba-tiba mengeluarkan kotak cincin kecil dari saku jaketnya. Tanpa banyak kata-kata puitis, dia hanya menatap mataku dan bertanya apakah aku bersedia menghabiskan sisa hidup bersamanya. Tentu saja, dengan mata berkaca-kaca, aku menjawab \"Iya\".",
     "story_marriage": "Perjalanan kami selama hampir lima tahun tidak selalu berjalan mulus. Kami sempat melewati fase Long Distance Relationship (LDR) selama setahun ketika salah satu dari kami harus dinas ke luar kota. Ada banyak kompromi, perbedaan pendapat, dan penyesuaian yang harus dilewati. Namun, setiap tantangan justru membuat kami semakin mengerti dan yakin bahwa kami bisa saling melengkapi. Hingga akhirnya di tahun ini, kami memutuskan untuk mengikat janji suci dan memulai lembaran baru sebagai keluarga.",
     "closing_message": "Merupakan suatu kehormatan dan kebahagiaan yang tak terhingga bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu. Terima kasih atas segala cinta, dukungan, dan doa yang telah menyertai langkah kami hingga hari ini. Sampai jumpa di hari bahagia kami!",
-    "visitor_count": 1,
-    "music_url": "/uploads/music/perfect_ed_sheeran_1784220481434.mp3"
+    "visitor_count": 7,
+    "music_url": "/uploads/music/perfect_ed_sheeran_1784220481434.mp3",
+    "groom_image": "/uploads/wedding-info/weeding_1784222530667.jpg",
+    "bride_image": "/uploads/wedding-info/weeding_1784222534507.jpg",
+    "theme": "dark"
   },
   "parents": [
     {
       "id": "1",
       "type": "groom",
-      "father_name": "",
-      "mother_name": ""
+      "father_name": "Rahmat",
+      "mother_name": "Juminah",
+      "father_photo": "/uploads/parents/Screenshot_2026_05_18_150041_1784222553102.png",
+      "mother_photo": "/uploads/parents/Screenshot_2026_05_19_172116_1784222578483.png"
     },
     {
       "id": "2",
       "type": "bride",
-      "father_name": "",
-      "mother_name": ""
+      "father_name": "Edi",
+      "mother_name": "Asril",
+      "mother_photo": "/uploads/parents/Screenshot_2026_05_19_172116_1784222572514.png",
+      "father_photo": "/uploads/parents/Screenshot_2026_05_19_172128_1784222575584.png"
     }
   ],
   "gallery": [
@@ -65,10 +72,10 @@
   "gift_accounts": [
     {
       "id": "1",
-      "bank_name": "",
-      "account_number": "",
-      "account_holder": "",
-      "qris_image": ""
+      "bank_name": "BCA",
+      "account_number": "787837828",
+      "account_holder": "Hery Azinurer",
+      "qris_image": "/uploads/qris/Screenshot_2026_05_19_143142_1784222625589.png"
     }
   ],
   "rsvp": [
@@ -116,6 +123,60 @@
     }
   ],
   "analytics_logs": [
+    {
+      "id": "1784223074360",
+      "created_at": "2026-07-16T17:31:14.360Z",
+      "browser": "Chrome",
+      "device": "Desktop",
+      "country": "Indonesia",
+      "referrer": "http://localhost:3000/",
+      "page_path": "/"
+    },
+    {
+      "id": "1784223054944",
+      "created_at": "2026-07-16T17:30:54.944Z",
+      "browser": "Chrome",
+      "device": "Desktop",
+      "country": "Indonesia",
+      "referrer": "http://localhost:3000/",
+      "page_path": "/"
+    },
+    {
+      "id": "1784222968809",
+      "created_at": "2026-07-16T17:29:28.809Z",
+      "browser": "Chrome",
+      "device": "Desktop",
+      "country": "Indonesia",
+      "referrer": "http://localhost:3000/",
+      "page_path": "/"
+    },
+    {
+      "id": "1784222882604",
+      "created_at": "2026-07-16T17:28:02.604Z",
+      "browser": "Chrome",
+      "device": "Desktop",
+      "country": "Indonesia",
+      "referrer": "http://localhost:3000/",
+      "page_path": "/"
+    },
+    {
+      "id": "1784222668068",
+      "created_at": "2026-07-16T17:24:28.068Z",
+      "browser": "Chrome",
+      "device": "Desktop",
+      "country": "Indonesia",
+      "referrer": "http://localhost:3000/",
+      "page_path": "/"
+    },
+    {
+      "id": "1784222484067",
+      "created_at": "2026-07-16T17:21:24.067Z",
+      "browser": "Chrome",
+      "device": "Desktop",
+      "country": "Indonesia",
+      "referrer": "http://localhost:3000/",
+      "page_path": "/"
+    },
     {
       "id": "1784218290014",
       "created_at": "2026-07-16T16:11:30.014Z",

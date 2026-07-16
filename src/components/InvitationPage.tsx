@@ -280,12 +280,12 @@ export default function InvitationPage({ initialData, guestName }: InvitationPag
   };
 
   // Feature Toggles and content validation helpers
-  const showMusic = initialData.event.enable_music;
-  const showCountdown = initialData.event.enable_countdown;
-  const showGallery = initialData.event.enable_guestbook && initialData.gallery && initialData.gallery.length > 0;
-  const showRSVP = initialData.event.enable_rsvp;
-  const showGuestbook = initialData.event.enable_guestbook;
-  const showGift = initialData.event.enable_gift && initialData.giftAccounts && initialData.giftAccounts.length > 0;
+  const showMusic = initialData.event.enable_music ?? true;
+  const showCountdown = initialData.event.enable_countdown ?? true;
+  const showGallery = initialData.gallery && initialData.gallery.length > 0;
+  const showRSVP = initialData.event.enable_rsvp ?? true;
+  const showGuestbook = initialData.event.enable_guestbook ?? true;
+  const showGift = (initialData.event.enable_gift ?? true) && initialData.giftAccounts && initialData.giftAccounts.length > 0;
 
   // Render maintenance view if enabled by admin
   if (initialData.event.maintenance_mode) {
