@@ -31,8 +31,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
-      <body className={`${playfair.variable} ${plusJakarta.variable} font-sans antialiased bg-[#FDFBF7] text-[#333333]`}>
+    <html lang="id" suppressHydrationWarning>
+      <body className={`${playfair.variable} ${plusJakarta.variable} font-sans antialiased bg-[#FDFBF7] text-[#333333]`} suppressHydrationWarning>
         <Providers>
           {children}
         </Providers>
