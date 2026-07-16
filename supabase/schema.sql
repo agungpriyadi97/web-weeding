@@ -110,11 +110,5 @@ create policy "Allow public read access to guests" on public.guests for select u
 create policy "Allow admin write access to guests" on public.guests for all using (auth.role() = 'authenticated');
 
 -- Enable real-time for guestbook
-begin;
-  -- remove the publication if it already exists
-  drop publication if exists supabase_realtime;
-  -- create publication
-  create publication supabase_realtime;
-commit;
-
+alter publication supabase_realtime add table public.rsvp;
 alter publication supabase_realtime add table public.guestbook;
