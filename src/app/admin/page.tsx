@@ -736,7 +736,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="bg-white p-5 rounded-xl border border-gold-100 shadow-xs flex flex-col justify-between">
                 <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total Kunjungan</span>
-                <span className="text-3xl font-bold font-serif text-gold-600 mt-2">{(weddingData?.event.visitor_count || 0)}</span>
+                <span className="text-3xl font-bold font-serif text-gold-600 mt-2">{(weddingData?.event?.visitor_count || 0)}</span>
               </div>
               <div className="bg-white p-5 rounded-xl border border-gold-100 shadow-xs flex flex-col justify-between">
                 <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total Tamu (Hadir)</span>

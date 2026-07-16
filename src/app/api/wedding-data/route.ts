@@ -24,6 +24,7 @@ export async function GET() {
 
     return NextResponse.json({
       info,
+      event: info,
       parents,
       gallery,
       giftAccounts,
