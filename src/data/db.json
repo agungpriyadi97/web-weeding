@@ -13,7 +13,8 @@
     "story_proposal": "Tepat di hari perayaan anniversary ketiga kami di bulan Agustus 2023, dia mengajakku liburan singkat ke Bali. Sore itu, di pinggir pantai Jimbaran sambil menunggu matahari terbenam, dia tiba-tiba mengeluarkan kotak cincin kecil dari saku jaketnya. Tanpa banyak kata-kata puitis, dia hanya menatap mataku dan bertanya apakah aku bersedia menghabiskan sisa hidup bersamanya. Tentu saja, dengan mata berkaca-kaca, aku menjawab \"Iya\".",
     "story_marriage": "Perjalanan kami selama hampir lima tahun tidak selalu berjalan mulus. Kami sempat melewati fase Long Distance Relationship (LDR) selama setahun ketika salah satu dari kami harus dinas ke luar kota. Ada banyak kompromi, perbedaan pendapat, dan penyesuaian yang harus dilewati. Namun, setiap tantangan justru membuat kami semakin mengerti dan yakin bahwa kami bisa saling melengkapi. Hingga akhirnya di tahun ini, kami memutuskan untuk mengikat janji suci dan memulai lembaran baru sebagai keluarga.",
     "closing_message": "Merupakan suatu kehormatan dan kebahagiaan yang tak terhingga bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu. Terima kasih atas segala cinta, dukungan, dan doa yang telah menyertai langkah kami hingga hari ini. Sampai jumpa di hari bahagia kami!",
-    "visitor_count": 1
+    "visitor_count": 1,
+    "music_url": "/uploads/music/perfect_ed_sheeran_1784220481434.mp3"
   },
   "parents": [
     {
@@ -31,24 +32,34 @@
   ],
   "gallery": [
     {
+      "id": "1",
       "image_url": "/images/gallery1.png",
       "sort_order": 1
     },
     {
+      "id": "2",
       "image_url": "/images/gallery2.png",
       "sort_order": 2
     },
     {
+      "id": "3",
       "image_url": "/images/gallery3.png",
       "sort_order": 3
     },
     {
+      "id": "4",
       "image_url": "/images/gallery4.png",
       "sort_order": 4
     },
     {
+      "id": "5",
       "image_url": "--",
       "sort_order": 5
+    },
+    {
+      "id": "6",
+      "image_url": "/uploads/gallery/weeding_1784220509778.jpg",
+      "sort_order": 6
     }
   ],
   "gift_accounts": [

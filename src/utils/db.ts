@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { supabase } from './supabaseClient';
+import { supabase, getSupabaseAdmin } from './supabaseClient';
 import { parseMarkdown, stringifyToMarkdown } from './parser';
 import { EventDetail, ParentDetail, GalleryItem, GiftAccount, RSVP, Guestbook, Guest, WeddingData, AnalyticsLog } from '../types/wedding';
 
@@ -19,7 +19,7 @@ function getMarkdownData(): WeddingData {
   return {
     groom: { namaLengkap: 'Groom', namaPanggilan: 'Groom' },
     bride: { namaLengkap: 'Bride', namaPanggilan: 'Bride' },
-    event: { 
+    event: {
       groom_name: '', groom_nickname: '', bride_name: '', bride_nickname: '', event_date: '', event_time: '', location: '', address: '', google_maps: '',
       theme: 'elegant-gold', primary_color: '#C5A059', secondary_color: '#FDFBF7', opening_animation: true,
       enable_music: true, enable_countdown: true, enable_guestbook: true, enable_rsvp: true, enable_gift: true, maintenance_mode: false, visitor_count: 0,
@@ -38,7 +38,7 @@ function initLocalDb() {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  
+
   if (!fs.existsSync(LOCAL_DB_PATH)) {
     const mdData = getMarkdownData();
     const initialDb = {
@@ -56,7 +56,7 @@ function initLocalDb() {
         story_proposal: mdData.event.story_proposal || '',
         story_marriage: mdData.event.story_marriage || '',
         closing_message: mdData.closingMessage || '',
-        
+
         // Extended options
         theme: 'elegant-gold',
         primary_color: '#C5A059',
@@ -66,16 +66,16 @@ function initLocalDb() {
         groom_image: '',
         bride_image: '',
         opening_animation: true,
-        
+
         enable_music: true,
         enable_countdown: true,
         enable_guestbook: true,
         enable_rsvp: true,
         enable_gift: true,
         maintenance_mode: false,
-        
+
         music_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-        
+
         website_title: `The Wedding of ${mdData.groom.namaPanggilan} & ${mdData.bride.namaPanggilan}`,
         meta_description: `Undangan Pernikahan Digital ${mdData.groom.namaLengkap} & ${mdData.bride.namaLengkap}`,
         favicon: '',
@@ -84,8 +84,8 @@ function initLocalDb() {
         canonical_url: '',
         visitor_count: 0
       },
-      parents: mdData.parents.map((p, idx) => ({ 
-        id: String(idx + 1), 
+      parents: mdData.parents.map((p, idx) => ({
+        id: String(idx + 1),
         ...p,
         father_photo: '',
         mother_photo: ''
@@ -93,12 +93,12 @@ function initLocalDb() {
       gallery: mdData.gallery.map(item => ({
         ...item,
         image_url: item.image_url.includes('Foto 1') ? '/images/gallery1.png' :
-                   item.image_url.includes('Foto 2') ? '/images/gallery2.png' :
-                   item.image_url.includes('Foto 3') ? '/images/gallery3.png' :
-                   item.image_url.includes('Foto 4') ? '/images/gallery4.png' : item.image_url
+          item.image_url.includes('Foto 2') ? '/images/gallery2.png' :
+            item.image_url.includes('Foto 3') ? '/images/gallery3.png' :
+              item.image_url.includes('Foto 4') ? '/images/gallery4.png' : item.image_url
       })),
-      gift_accounts: mdData.giftAccounts.map((g, idx) => ({ 
-        id: String(idx + 1), 
+      gift_accounts: mdData.giftAccounts.map((g, idx) => ({
+        id: String(idx + 1),
         ...g,
         qris_image: '/images/qris.png',
         sort_order: idx
@@ -108,14 +108,14 @@ function initLocalDb() {
       guests: mdData.guests.map((g, idx) => ({ id: String(idx + 1), ...g })),
       analytics_logs: [] as AnalyticsLog[]
     };
-    
+
     if (!initialDb.parents.length) {
       initialDb.parents = [
         { id: '1', type: 'groom', father_name: 'Ayah Pria', mother_name: 'Ibu Pria', father_photo: '', mother_photo: '' },
         { id: '2', type: 'bride', father_name: 'Ayah Wanita', mother_name: 'Ibu Wanita', father_photo: '', mother_photo: '' }
       ];
     }
-    
+
     if (!initialDb.gallery.length) {
       initialDb.gallery = [
         { id: '1', image_url: '/images/gallery1.png', sort_order: 1 },
@@ -130,7 +130,7 @@ function initLocalDb() {
         { id: '1', bank_name: 'BCA', account_number: '123456789', account_holder: mdData.groom.namaLengkap, qris_image: '/images/qris.png', sort_order: 0 }
       ];
     }
-    
+
     fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(initialDb, null, 2), 'utf8');
   }
 }
@@ -518,7 +518,7 @@ export async function addAnalyticsLog(log: Omit<AnalyticsLog, 'id' | 'created_at
 // Sync back changes to wedding-data.md when edited from local admin dashboard
 export function syncLocalDbToMarkdown() {
   const db = readLocalDb();
-  
+
   const weddingData: WeddingData = {
     groom: {
       namaLengkap: db.wedding_info.groom_name,

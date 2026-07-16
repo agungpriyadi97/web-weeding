@@ -23,6 +23,7 @@
 - /images/gallery3.png
 - /images/gallery4.png
 - --
+- /uploads/gallery/weeding_1784220509778.jpg
 
 ---
 
