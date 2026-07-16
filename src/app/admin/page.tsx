@@ -25,7 +25,8 @@ import {
   FileSpreadsheet,
   Printer,
   Grid,
-  X
+  X,
+  Music
 } from 'lucide-react';
 import { WeddingData, RSVP, Guestbook, Guest, EventDetail, ParentDetail, GiftAccount, AnalyticsLog } from '@/types/wedding';
 
@@ -37,7 +38,7 @@ export default function AdminDashboard() {
   const [loginError, setLoginError] = useState('');
 
   // App data states
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'info' | 'parents' | 'gallery' | 'gifts' | 'rsvps' | 'wishes' | 'guests' | 'theme' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'info' | 'parents' | 'gallery' | 'gifts' | 'rsvps' | 'wishes' | 'guests' | 'theme' | 'settings' | 'music'>('dashboard');
   const [loading, setLoading] = useState(true);
   const [weddingData, setWeddingData] = useState<WeddingData | null>(null);
   
@@ -215,9 +216,24 @@ export default function AdminDashboard() {
     setSaveStatus('saving');
     try {
       const urls: string[] = [];
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
       for (let i = 0; i < files.length; i++) {
-        const url = await uploadFile(files[i], 'gallery');
+        const file = files[i];
+        if (!validTypes.includes(file.type)) {
+          alert(`File ${file.name} tidak valid. Hanya JPG, PNG, WEBP.`);
+          continue;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`File ${file.name} melebihi batas 10MB.`);
+          continue;
+        }
+        const url = await uploadFile(file, 'gallery');
         urls.push(url);
+      }
+
+      if (urls.length === 0) {
+        setSaveStatus('idle');
+        return;
       }
 
       // Append new gallery items
@@ -270,6 +286,72 @@ export default function AdminDashboard() {
         } else {
           setSaveStatus('error');
         }
+      }
+    } catch (err) {
+      console.error(err);
+      setSaveStatus('error');
+    }
+  };
+
+  const handleMusicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== 'audio/mpeg' && file.type !== 'audio/mp3' && !file.name.endsWith('.mp3')) {
+      alert('File tidak valid. Hanya mendukung format MP3.');
+      return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      alert('File terlalu besar. Maksimal 20MB.');
+      return;
+    }
+
+    setSaveStatus('saving');
+    try {
+      const url = await uploadFile(file, 'music');
+      
+      const updatedInfo = { ...infoForm, music_url: url };
+      setInfoForm(updatedInfo);
+
+      const res = await fetch('/api/wedding-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          info: updatedInfo
+        }),
+      });
+
+      if (res.ok) {
+        setSaveStatus('success');
+        loadData();
+      } else {
+        setSaveStatus('error');
+      }
+    } catch (err) {
+      console.error(err);
+      setSaveStatus('error');
+    }
+  };
+
+  const handleDeleteMusic = async () => {
+    if (!confirm('Hapus musik latar ini?')) return;
+    setSaveStatus('saving');
+    try {
+      const updatedInfo = { ...infoForm, music_url: '' };
+      setInfoForm(updatedInfo);
+
+      const res = await fetch('/api/wedding-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          info: updatedInfo
+        }),
+      });
+
+      if (res.ok) {
+        setSaveStatus('success');
+        loadData();
+      } else {
+        setSaveStatus('error');
       }
     } catch (err) {
       console.error(err);
@@ -683,6 +765,7 @@ export default function AdminDashboard() {
               { id: 'rsvps', label: 'RSVP Manager', icon: UserCheck },
               { id: 'wishes', label: 'Guestbook Wishes', icon: BookOpen },
               { id: 'guests', label: 'Guests Registry', icon: Users },
+              { id: 'music', label: 'Music Upload', icon: Music },
               { id: 'theme', label: 'Design & Themes', icon: Grid },
               { id: 'settings', label: 'Website Settings', icon: Settings },
             ].map(tab => {
@@ -690,7 +773,7 @@ export default function AdminDashboard() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as 'dashboard' | 'info' | 'parents' | 'gallery' | 'gifts' | 'rsvps' | 'wishes' | 'guests' | 'theme' | 'settings')}
+                  onClick={() => setActiveTab(tab.id as 'dashboard' | 'info' | 'parents' | 'gallery' | 'gifts' | 'rsvps' | 'wishes' | 'guests' | 'theme' | 'settings' | 'music')}
                   className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                     activeTab === tab.id
                       ? 'bg-gold-50 text-gold-700 font-semibold border-l-4 border-gold-500'
@@ -1754,6 +1837,63 @@ export default function AdminDashboard() {
               </button>
             </div>
           </form>
+        )}
+
+        {/* 11. MUSIC UPLOAD SECTION */}
+        {activeTab === 'music' && (
+          <div className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-gold-100 shadow-sm">
+            <div>
+              <h2 className="text-2xl font-serif font-bold text-gold-800">Background Music Manager</h2>
+              <p className="text-xs text-gray-400 mt-1">Upload background music (MP3) for the digital invitation. Supported format: MP3 (Max 20MB).</p>
+            </div>
+
+            <div className="flex flex-col gap-6 mt-4 items-center">
+              {infoForm.music_url ? (
+                <div className="w-full max-w-md p-6 rounded-xl border border-gold-200 bg-gold-50/5 flex flex-col gap-4 items-center shadow-xs">
+                  <div className="w-12 h-12 bg-gold-100 text-gold-600 rounded-full flex items-center justify-center font-bold text-lg animate-bounce">
+                    🎵
+                  </div>
+                  <span className="text-xs font-semibold text-gray-700 text-center truncate max-w-xs" title={infoForm.music_url}>
+                    {infoForm.music_url.split('/').pop()}
+                  </span>
+                  
+                  {/* Audio player preview */}
+                  <audio src={infoForm.music_url} controls className="w-full mt-2" />
+
+                  <div className="flex gap-3 w-full mt-4">
+                    <label className="flex-1 py-2 border border-gold-400 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold text-center cursor-pointer flex items-center justify-center gap-1">
+                      <Upload className="w-3.5 h-3.5" /> Replace Music
+                      <input 
+                        type="file" 
+                        accept="audio/mp3,audio/mpeg" 
+                        className="hidden" 
+                        onChange={handleMusicUpload} 
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleDeleteMusic}
+                      className="flex-1 py-2 border border-red-200 hover:bg-red-50 text-red-500 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Delete Music
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full max-w-md p-8 border-2 border-dashed border-gold-200 hover:border-gold-400 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer relative bg-gold-50/5">
+                  <Upload className="w-8 h-8 text-gold-500 mb-3" />
+                  <p className="text-sm font-semibold text-gray-700">Pilih / Drag file musik MP3 di sini</p>
+                  <p className="text-xs text-gray-400 mt-1">Hanya mendukung format MP3 (Maksimal 20MB).</p>
+                  <input
+                    type="file"
+                    accept="audio/mp3,audio/mpeg"
+                    onChange={handleMusicUpload}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
         )}
 
         {/* QR CODE OVERLAY PREVIEW MODAL */}
