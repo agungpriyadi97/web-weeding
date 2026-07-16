@@ -1,0 +1,106 @@
+{
+  "wedding_info": {
+    "groom_name": "Hery Kurniawan",
+    "groom_nickname": "Hery",
+    "bride_name": "Irish Bella",
+    "bride_nickname": "Bella",
+    "event_date": "2026-12-25",
+    "event_time": "09:00 WIB - Selesai",
+    "location": "Kediaman Memplai Peria",
+    "address": "Gedung Sasana Kriya, Taman Mini Indonesia Indah (TMII), Jl. Raya Taman Mini, Ceger, Kec. Cipayung, Kota Jakarta Timur, Daerah Khusus Ibukota Jakarta 13820",
+    "google_maps": "https://maps.app.goo.gl/hPAPQR6axuLzKJGX6",
+    "story_meet": "Semua bermula dari ketidaksengajaan di sebuah kedai kopi kecil di kawasan Panglima Polim pada akhir tahun 2019. Saat itu hujan turun sangat deras, dan kami berdua sama-sama menumpang berteduh setelah pulang kerja. Berawal dari meminjam charger laptop, percakapan kami mengalir begitu saja membahas buku yang sedang kami baca. Siapa sangka, perkenalan singkat sore itu menjadi awal dari cerita panjang kami.",
+    "story_proposal": "Tepat di hari perayaan anniversary ketiga kami di bulan Agustus 2023, dia mengajakku liburan singkat ke Bali. Sore itu, di pinggir pantai Jimbaran sambil menunggu matahari terbenam, dia tiba-tiba mengeluarkan kotak cincin kecil dari saku jaketnya. Tanpa banyak kata-kata puitis, dia hanya menatap mataku dan bertanya apakah aku bersedia menghabiskan sisa hidup bersamanya. Tentu saja, dengan mata berkaca-kaca, aku menjawab \"Iya\".",
+    "story_marriage": "Perjalanan kami selama hampir lima tahun tidak selalu berjalan mulus. Kami sempat melewati fase Long Distance Relationship (LDR) selama setahun ketika salah satu dari kami harus dinas ke luar kota. Ada banyak kompromi, perbedaan pendapat, dan penyesuaian yang harus dilewati. Namun, setiap tantangan justru membuat kami semakin mengerti dan yakin bahwa kami bisa saling melengkapi. Hingga akhirnya di tahun ini, kami memutuskan untuk mengikat janji suci dan memulai lembaran baru sebagai keluarga.",
+    "closing_message": "Merupakan suatu kehormatan dan kebahagiaan yang tak terhingga bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu. Terima kasih atas segala cinta, dukungan, dan doa yang telah menyertai langkah kami hingga hari ini. Sampai jumpa di hari bahagia kami!"
+  },
+  "parents": [
+    {
+      "id": "1",
+      "type": "groom",
+      "father_name": "",
+      "mother_name": ""
+    },
+    {
+      "id": "2",
+      "type": "bride",
+      "father_name": "",
+      "mother_name": ""
+    }
+  ],
+  "gallery": [
+    {
+      "image_url": "/images/gallery1.png",
+      "sort_order": 1
+    },
+    {
+      "image_url": "/images/gallery2.png",
+      "sort_order": 2
+    },
+    {
+      "image_url": "/images/gallery3.png",
+      "sort_order": 3
+    },
+    {
+      "image_url": "/images/gallery4.png",
+      "sort_order": 4
+    },
+    {
+      "image_url": "--",
+      "sort_order": 5
+    }
+  ],
+  "gift_accounts": [
+    {
+      "id": "1",
+      "bank_name": "",
+      "account_number": "",
+      "account_holder": "",
+      "qris_image": ""
+    }
+  ],
+  "rsvp": [
+    {
+      "id": "1784215306719",
+      "created_at": "2026-07-16T15:21:46.719Z",
+      "guest_name": "Aji Family",
+      "attendance": "true",
+      "guest_count": 5,
+      "message": "Selamat Brother"
+    },
+    {
+      "id": "1784214984236",
+      "created_at": "2026-07-16T15:16:24.236Z",
+      "guest_name": "agung",
+      "attendance": "true",
+      "guest_count": 1,
+      "message": "selamat"
+    }
+  ],
+  "guestbook": [
+    {
+      "id": "1784215307241",
+      "created_at": "2026-07-16T15:21:47.241Z",
+      "guest_name": "Aji Family",
+      "message": "Selamat Brother"
+    },
+    {
+      "id": "1784214985069",
+      "created_at": "2026-07-16T15:16:25.069Z",
+      "guest_name": "agung",
+      "message": "selamat"
+    }
+  ],
+  "guests": [
+    {
+      "id": "1",
+      "guest_name": "Agung Priyadi",
+      "slug": "agung-priyadi"
+    },
+    {
+      "id": "2",
+      "guest_name": "Aji Satria",
+      "slug": "aji-satria"
+    }
+  ]
+}
