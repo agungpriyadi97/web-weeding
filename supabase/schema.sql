@@ -13,10 +13,45 @@ create table if not exists public.wedding_info (
     location text not null,
     address text not null,
     google_maps text not null,
+    
+    -- Story timeline
     story_meet text,
     story_proposal text,
     story_marriage text,
     closing_message text,
+    
+    -- Design & Theme customisation
+    theme text default 'elegant-gold' not null,
+    primary_color text default '#C5A059' not null,
+    secondary_color text default '#FDFBF7' not null,
+    hero_image text,
+    background_image text,
+    groom_image text,
+    bride_image text,
+    opening_animation boolean default true not null,
+    
+    -- Feature toggles
+    enable_music boolean default true not null,
+    enable_countdown boolean default true not null,
+    enable_guestbook boolean default true not null,
+    enable_rsvp boolean default true not null,
+    enable_gift boolean default true not null,
+    maintenance_mode boolean default false not null,
+    
+    -- Audio settings
+    music_url text,
+    
+    -- Metadata & SEO settings
+    website_title text default 'The Wedding invitation' not null,
+    meta_description text default 'Undangan Pernikahan Digital' not null,
+    favicon text,
+    og_image text,
+    seo_keywords text,
+    canonical_url text,
+    
+    -- Analytics counter
+    visitor_count integer default 0 not null,
+    
     created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
@@ -32,7 +67,9 @@ create table if not exists public.parents (
     id uuid default uuid_generate_v4() primary key,
     type text not null check (type in ('groom', 'bride')),
     father_name text not null,
-    mother_name text not null
+    mother_name text not null,
+    father_photo text,
+    mother_photo text
 );
 
 -- Table: gift_accounts
@@ -41,7 +78,8 @@ create table if not exists public.gift_accounts (
     bank_name text not null,
     account_number text not null,
     account_holder text not null,
-    qris_image text
+    qris_image text,
+    sort_order integer default 0 not null
 );
 
 -- Table: rsvp
@@ -59,6 +97,7 @@ create table if not exists public.guestbook (
     id uuid default uuid_generate_v4() primary key,
     guest_name text not null,
     message text not null,
+    is_approved boolean default true not null,
     created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
@@ -70,6 +109,17 @@ create table if not exists public.guests (
     created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Table: analytics_logs
+create table if not exists public.analytics_logs (
+    id uuid default uuid_generate_v4() primary key,
+    browser text,
+    device text,
+    country text,
+    referrer text,
+    page_path text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- Row Level Security (RLS) policies
 alter table public.wedding_info enable row level security;
 alter table public.gallery enable row level security;
@@ -78,6 +128,7 @@ alter table public.gift_accounts enable row level security;
 alter table public.rsvp enable row level security;
 alter table public.guestbook enable row level security;
 alter table public.guests enable row level security;
+alter table public.analytics_logs enable row level security;
 
 -- Policies: wedding_info
 create policy "Allow public read access to wedding_info" on public.wedding_info for select using (true);
@@ -109,6 +160,10 @@ create policy "Allow admin write access to guestbook" on public.guestbook for al
 create policy "Allow public read access to guests" on public.guests for select using (true);
 create policy "Allow admin write access to guests" on public.guests for all using (auth.role() = 'authenticated');
 
--- Enable real-time for guestbook
+-- Policies: analytics_logs
+create policy "Allow public insert access to analytics_logs" on public.analytics_logs for insert with check (true);
+create policy "Allow admin read access to analytics_logs" on public.analytics_logs for select using (auth.role() = 'authenticated');
+
+-- Enable real-time replication
 alter publication supabase_realtime add table public.rsvp;
 alter publication supabase_realtime add table public.guestbook;

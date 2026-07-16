@@ -24,6 +24,19 @@ export function parseMarkdown(content: string): WeddingData {
       location: '',
       address: '',
       google_maps: '',
+      theme: 'elegant-gold',
+      primary_color: '#C5A059',
+      secondary_color: '#FDFBF7',
+      opening_animation: true,
+      enable_music: true,
+      enable_countdown: true,
+      enable_guestbook: true,
+      enable_rsvp: true,
+      enable_gift: true,
+      maintenance_mode: false,
+      visitor_count: 0,
+      website_title: 'Invitation',
+      meta_description: 'Digital Invitation'
     },
     parents: [],
     gallery: [],
@@ -189,6 +202,7 @@ export function parseMarkdown(content: string): WeddingData {
           account_number: accNum,
           account_holder: holder,
           qris_image: qris || undefined,
+          sort_order: result.giftAccounts.length,
         });
       }
     } else if (headerLine.includes('Ucapan Penutup')) {

@@ -1,5 +1,18 @@
 import { NextResponse } from 'next/server';
-import { getWeddingInfo, updateWeddingInfo, getParents, updateParents, getGallery, getGiftAccounts, updateGiftAccounts, getGuests, syncLocalDbToMarkdown, isSupabaseConfigured } from '@/utils/db';
+import { 
+  getWeddingInfo, 
+  updateWeddingInfo, 
+  getParents, 
+  updateParents, 
+  getGallery, 
+  updateGallery,
+  getGiftAccounts, 
+  updateGiftAccounts, 
+  getGuests, 
+  updateGuests,
+  syncLocalDbToMarkdown, 
+  isSupabaseConfigured 
+} from '@/utils/db';
 
 export async function GET() {
   try {
@@ -34,6 +47,12 @@ export async function POST(request: Request) {
     }
     if (body.giftAccounts) {
       await updateGiftAccounts(body.giftAccounts);
+    }
+    if (body.gallery) {
+      await updateGallery(body.gallery);
+    }
+    if (body.guests) {
+      await updateGuests(body.guests);
     }
     
     // Sync to local markdown file if not using Supabase so local wedding-data.md stays updated

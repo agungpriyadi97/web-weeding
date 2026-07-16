@@ -3,6 +3,8 @@ export interface MempelaiDetail {
   namaPanggilan: string;
   fatherName?: string;
   motherName?: string;
+  fatherPhoto?: string;
+  motherPhoto?: string;
 }
 
 export interface EventDetail {
@@ -16,10 +18,45 @@ export interface EventDetail {
   location: string;
   address: string;
   google_maps: string;
+  
+  // Story timeline
   story_meet?: string;
   story_proposal?: string;
   story_marriage?: string;
   closing_message?: string;
+
+  // Design customisation options
+  theme: string;
+  primary_color: string;
+  secondary_color: string;
+  hero_image?: string;
+  background_image?: string;
+  groom_image?: string;
+  bride_image?: string;
+  opening_animation: boolean;
+
+  // Business toggles
+  enable_music: boolean;
+  enable_countdown: boolean;
+  enable_guestbook: boolean;
+  enable_rsvp: boolean;
+  enable_gift: boolean;
+  maintenance_mode: boolean;
+
+  // Audio track settings
+  music_url?: string;
+
+  // Metadata & SEO configuration
+  website_title: string;
+  meta_description: string;
+  favicon?: string;
+  og_image?: string;
+  seo_keywords?: string;
+  canonical_url?: string;
+
+  // Analytics
+  visitor_count: number;
+  
   created_at?: string;
 }
 
@@ -34,6 +71,8 @@ export interface ParentDetail {
   type: 'groom' | 'bride';
   father_name: string;
   mother_name: string;
+  father_photo?: string;
+  mother_photo?: string;
 }
 
 export interface GiftAccount {
@@ -42,6 +81,7 @@ export interface GiftAccount {
   account_number: string;
   account_holder: string;
   qris_image?: string;
+  sort_order: number;
 }
 
 export interface RSVP {
@@ -57,6 +97,7 @@ export interface Guestbook {
   id?: string;
   guest_name: string;
   message: string;
+  is_approved: boolean;
   created_at?: string;
 }
 
@@ -64,6 +105,16 @@ export interface Guest {
   id?: string;
   guest_name: string;
   slug: string;
+  created_at?: string;
+}
+
+export interface AnalyticsLog {
+  id?: string;
+  browser?: string;
+  device?: string;
+  country?: string;
+  referrer?: string;
+  page_path?: string;
   created_at?: string;
 }
 
