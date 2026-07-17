@@ -72,6 +72,23 @@ const ArabicCorner = ({ className, style }: { className?: string; style?: React.
   </svg>
 );
 
+const LeafOrnament = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 100 100" 
+    className={`pointer-events-none absolute ${className || ''}`}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.2"
+  >
+    <path d="M10,90 Q40,60 90,10" className="opacity-40" />
+    <path d="M50,50 Q30,40 38,30 Q50,42 50,50" fill="currentColor" className="opacity-20" />
+    <path d="M30,70 Q10,60 18,50 Q30,62 30,70" fill="currentColor" className="opacity-20" />
+    <path d="M70,30 Q80,10 72,18 Q62,30 70,30" fill="currentColor" className="opacity-20" />
+    <path d="M50,50 Q60,30 52,38 Q42,50 50,50" fill="currentColor" className="opacity-20" />
+    <path d="M90,10 Q80,0 82,8 Q88,18 90,10" fill="currentColor" className="opacity-30" />
+  </svg>
+);
+
 const CornerOrnament = ({ type, color, className }: { type: string; color: string; className?: string }) => {
   const style = { color };
   if (type === 'traditional-culture' || type === 'batik') {
@@ -467,36 +484,68 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
             initial={{ y: 0 }}
             exit={{ y: '-100%' }}
             transition={{ duration: 1.2, ease: [0.77, 0, 0.175, 1] }}
-            className="fixed inset-0 z-50 flex flex-col justify-between items-center text-center px-6 py-16 bg-cover bg-center"
-            style={{
-              backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.55)), url("${
-                initialData.event.hero_image || '/images/cover.png'
-              }")`,
-            }}
+            className={`fixed inset-0 z-50 flex flex-col justify-between items-center text-center px-6 py-12 overflow-y-auto ${
+              theme.id === 'leafitation' 
+                ? 'bg-[#F3F6F3] text-[#3B4A3E]' 
+                : 'bg-cover bg-center text-white'
+            }`}
+            style={
+              theme.id === 'leafitation'
+                ? {}
+                : {
+                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.55)), url("${
+                      initialData.event.hero_image || '/images/cover.png'
+                    }")`,
+                  }
+            }
           >
-            <div className="mt-6 flex flex-col items-center">
-              <span className={`text-white/80 font-medium uppercase tracking-widest text-xs ${theme.fontBody}`}>Wedding Invitation</span>
-              <div className="w-12 h-px bg-white/30 my-3" />
-              <h1 className={`text-4xl sm:text-5xl md:text-6xl text-white font-bold tracking-wide mt-2 drop-shadow-md ${theme.fontHeading}`}>
+            {theme.id === 'leafitation' && (
+              <>
+                <LeafOrnament className="top-0 left-0 -scale-x-100 scale-y-100 rotate-90 origin-top-left translate-x-4 translate-y-4 w-32 h-32" />
+                <LeafOrnament className="bottom-0 right-0 scale-x-100 -scale-y-100 -rotate-90 origin-bottom-right -translate-x-4 -translate-y-4 w-32 h-32" />
+              </>
+            )}
+
+            <div className="mt-4 flex flex-col items-center">
+              <span className={`text-xs font-semibold uppercase tracking-widest opacity-70 ${theme.fontBody}`}>
+                Wedding Invitation
+              </span>
+              <div className="w-12 h-px bg-current opacity-30 my-3" />
+              <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold tracking-wide mt-2 ${theme.fontHeading}`} style={theme.id === 'leafitation' ? { color: theme.colors.primary } : {}}>
                 {groom.namaPanggilan} & {bride.namaPanggilan}
               </h1>
             </div>
 
-            <div className="flex flex-col items-center gap-6 max-w-sm w-full bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-2xl">
+            {theme.id === 'leafitation' && initialData.event.hero_image ? (
+              <div className="my-6 relative w-44 h-60 border-2 border-[#C5A880] rounded-t-full shadow-xl shadow-green-900/10 overflow-hidden shrink-0">
+                <Image 
+                  src={initialData.event.hero_image} 
+                  alt="Cover couple" 
+                  fill 
+                  className="object-cover" 
+                />
+              </div>
+            ) : null}
+
+            <div className={`flex flex-col items-center gap-6 max-w-sm w-full p-8 rounded-3xl border shadow-2xl ${
+              theme.id === 'leafitation'
+                ? 'bg-white/80 border-[#5F7C66]/15 backdrop-blur-md'
+                : 'bg-black/40 border-white/10 backdrop-blur-md'
+            }`}>
               {guestName ? (
-                <div className="text-white">
-                  <p className="text-xs text-white/70 font-medium tracking-widest uppercase">Dear Honorable Guest:</p>
-                  <p className={`text-xl sm:text-2xl font-bold mt-2 ${theme.fontHeading}`} style={{ color: theme.colors.accent }}>{guestName}</p>
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest opacity-60 font-semibold">Dear Honorable Guest:</p>
+                  <p className={`text-2xl font-bold mt-2 ${theme.fontHeading}`} style={{ color: theme.colors.accent }}>{guestName}</p>
                 </div>
               ) : (
-                <p className="text-sm text-white/80 font-medium tracking-wide">
+                <p className="text-sm font-medium opacity-85">
                   Kami mengundang Anda untuk merayakan hari istimewa kami.
                 </p>
               )}
 
               <button
                 onClick={handleOpenInvitation}
-                className={`w-full py-3.5 rounded-full text-white font-bold text-xs tracking-widest uppercase hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2`}
+                className="w-full py-3.5 rounded-full text-white font-bold text-xs tracking-widest uppercase hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2"
                 style={{ backgroundColor: theme.colors.primary }}
               >
                 <Heart className="w-4 h-4 fill-white animate-pulse" />
@@ -504,7 +553,7 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
               </button>
             </div>
 
-            <div className="text-white/70 text-xs sm:text-sm font-semibold tracking-widest uppercase">
+            <div className="text-xs sm:text-sm font-bold tracking-widest uppercase opacity-80 mt-4">
               {formatIndoDate(initialData.event.event_date)}
             </div>
           </motion.div>
@@ -514,21 +563,46 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
       {/* MAIN WEDDING INVITATION VIEW */}
       {isOpened && (
         <div className="w-full min-h-screen flex flex-col items-center relative z-10">
+          {theme.id === 'leafitation' && (
+            <>
+              {/* Background botanical leaves floating on sides of the page */}
+              <LeafOrnament className="fixed top-24 left-4 w-32 h-32 hidden xl:block opacity-20 rotate-45" />
+              <LeafOrnament className="fixed top-1/3 right-4 w-32 h-32 hidden xl:block opacity-20 -rotate-45" />
+              <LeafOrnament className="fixed bottom-1/4 left-6 w-32 h-32 hidden xl:block opacity-20 rotate-12" />
+            </>
+          )}
           
           {/* Top progress line accent */}
           <div className="w-full h-1 fixed top-0 left-0 z-40" style={{ backgroundColor: theme.colors.primary }} />
 
           {/* 2. OPENING SECTION */}
-          <section className="min-h-screen w-full flex flex-col justify-center items-center text-center px-6 py-20 relative bg-cover bg-center"
-            style={initialData.event.hero_image ? {
-              backgroundImage: `linear-gradient(to bottom, rgba(${theme.colors.secondary === '#111111' ? '17,17,17' : '253,251,247'}, 0.95), rgba(${theme.colors.secondary === '#111111' ? '17,17,17' : '253,251,247'}, 0.9)), url("${initialData.event.hero_image}")`,
-            } : {}}>
+          <section 
+            className="min-h-screen w-full flex flex-col justify-center items-center text-center px-6 py-20 relative overflow-hidden"
+            style={
+              theme.id === 'leafitation'
+                ? {}
+                : initialData.event.hero_image
+                ? {
+                    backgroundImage: `linear-gradient(to bottom, rgba(${theme.colors.secondary === '#111111' ? '17,17,17' : '253,251,247'}, 0.95), rgba(${theme.colors.secondary === '#111111' ? '17,17,17' : '253,251,247'}, 0.9)), url("${initialData.event.hero_image}")`,
+                  }
+                : {}
+            }
+          >
+            {theme.id === 'leafitation' && (
+              <>
+                <LeafOrnament className="top-10 left-10 -scale-x-100 scale-y-100 rotate-45 w-28 h-28" />
+                <LeafOrnament className="bottom-10 right-10 scale-x-100 -scale-y-100 -rotate-45 w-28 h-28" />
+              </>
+            )}
+
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2 }}
-              className="max-w-2xl mx-auto flex flex-col items-center relative p-12 rounded-3xl"
+              className={`max-w-2xl mx-auto flex flex-col items-center relative p-12 rounded-3xl ${
+                theme.id === 'leafitation' ? 'bg-white/80 border border-[#5F7C66]/15 backdrop-blur-md shadow-xl shadow-green-900/5' : ''
+              }`}
             >
               <CornerOrnament type={theme.ornaments.type} color={theme.colors.primary} />
               
@@ -594,7 +668,12 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                 style={{ borderColor: `${theme.colors.primary}15` }}
               >
                 {initialData.event.groom_image ? (
-                  <div className="relative w-28 h-28 mb-6 shadow-md border-2 rounded-full overflow-hidden" style={{ borderColor: theme.colors.primary }}>
+                  <div 
+                    className={`relative mb-6 shadow-md border-2 overflow-hidden ${
+                      theme.id === 'leafitation' ? 'w-36 h-48 rounded-t-full shadow-lg shadow-green-900/5' : 'w-28 h-28 rounded-full'
+                    }`} 
+                    style={{ borderColor: theme.id === 'leafitation' ? theme.colors.accent : theme.colors.primary }}
+                  >
                     <Image 
                       src={initialData.event.groom_image} 
                       alt={groom.namaLengkap} 
@@ -655,7 +734,12 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                 style={{ borderColor: `${theme.colors.primary}15` }}
               >
                 {initialData.event.bride_image ? (
-                  <div className="relative w-28 h-28 mb-6 shadow-md border-2 rounded-full overflow-hidden" style={{ borderColor: theme.colors.primary }}>
+                  <div 
+                    className={`relative mb-6 shadow-md border-2 overflow-hidden ${
+                      theme.id === 'leafitation' ? 'w-36 h-48 rounded-t-full shadow-lg shadow-green-900/5' : 'w-28 h-28 rounded-full'
+                    }`} 
+                    style={{ borderColor: theme.id === 'leafitation' ? theme.colors.accent : theme.colors.primary }}
+                  >
                     <Image 
                       src={initialData.event.bride_image} 
                       alt={bride.namaLengkap} 
