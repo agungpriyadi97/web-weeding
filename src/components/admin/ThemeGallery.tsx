@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getAllThemes, ThemeConfig } from '@/themes';
+import { getAllThemes } from '@/themes';
 import { WeddingData, ThemeSettings } from '@/types/wedding';
 import InvitationPage from '../InvitationPage';
 import { X, Check, Eye } from 'lucide-react';

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -14,8 +15,7 @@ import {
   Calendar as CalendarIcon,
   AlertTriangle,
   ChevronLeft,
-  ChevronRight,
-  Info
+  ChevronRight
 } from 'lucide-react';
 import { WeddingData, RSVP, Guestbook } from '../types/wedding';
 import Countdown from './Countdown';
@@ -560,12 +560,14 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                 style={{ borderColor: `${theme.colors.primary}15` }}
               >
                 {initialData.event.groom_image ? (
-                  <img 
-                    src={initialData.event.groom_image} 
-                    alt={initialData.groom.namaLengkap} 
-                    className="w-28 h-28 rounded-full object-cover mb-6 shadow-md border-2"
-                    style={{ borderColor: theme.colors.primary }}
-                  />
+                  <div className="relative w-28 h-28 mb-6 shadow-md border-2 rounded-full overflow-hidden" style={{ borderColor: theme.colors.primary }}>
+                    <Image 
+                      src={initialData.event.groom_image} 
+                      alt={initialData.groom.namaLengkap} 
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                 ) : (
                   <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 text-3xl font-bold border-2" style={{ backgroundColor: `${theme.colors.primary}10`, borderColor: theme.colors.primary, color: theme.colors.primary }}>
                     G
@@ -581,23 +583,27 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                     <div className="flex gap-4 items-start justify-center">
                       <div className="text-center">
                         {initialData.parents.find(p => p.type === 'groom')?.father_photo && (
-                          <img 
-                            src={initialData.parents.find(p => p.type === 'groom')?.father_photo} 
-                            alt="Father" 
-                            className="w-12 h-12 rounded-full object-cover border mb-1 mx-auto"
-                            style={{ borderColor: `${theme.colors.primary}30` }}
-                          />
+                          <div className="relative w-12 h-12 rounded-full overflow-hidden border mb-1 mx-auto" style={{ borderColor: `${theme.colors.primary}30` }}>
+                            <Image 
+                              src={initialData.parents.find(p => p.type === 'groom')?.father_photo || ''} 
+                              alt="Father" 
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
                         )}
                         <p className="text-xs font-medium">Bapak {initialData.groom.fatherName || '-'}</p>
                       </div>
                       <div className="text-center">
                         {initialData.parents.find(p => p.type === 'groom')?.mother_photo && (
-                          <img 
-                            src={initialData.parents.find(p => p.type === 'groom')?.mother_photo} 
-                            alt="Mother" 
-                            className="w-12 h-12 rounded-full object-cover border mb-1 mx-auto"
-                            style={{ borderColor: `${theme.colors.primary}30` }}
-                          />
+                          <div className="relative w-12 h-12 rounded-full overflow-hidden border mb-1 mx-auto" style={{ borderColor: `${theme.colors.primary}30` }}>
+                            <Image 
+                              src={initialData.parents.find(p => p.type === 'groom')?.mother_photo || ''} 
+                              alt="Mother" 
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
                         )}
                         <p className="text-xs font-medium">Ibu {initialData.groom.motherName || '-'}</p>
                       </div>
@@ -615,12 +621,14 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                 style={{ borderColor: `${theme.colors.primary}15` }}
               >
                 {initialData.event.bride_image ? (
-                  <img 
-                    src={initialData.event.bride_image} 
-                    alt={initialData.bride.namaLengkap} 
-                    className="w-28 h-28 rounded-full object-cover mb-6 shadow-md border-2"
-                    style={{ borderColor: theme.colors.primary }}
-                  />
+                  <div className="relative w-28 h-28 mb-6 shadow-md border-2 rounded-full overflow-hidden" style={{ borderColor: theme.colors.primary }}>
+                    <Image 
+                      src={initialData.event.bride_image} 
+                      alt={initialData.bride.namaLengkap} 
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                 ) : (
                   <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 text-3xl font-bold border-2" style={{ backgroundColor: `${theme.colors.primary}10`, borderColor: theme.colors.primary, color: theme.colors.primary }}>
                     B
@@ -636,23 +644,27 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                     <div className="flex gap-4 items-start justify-center">
                       <div className="text-center">
                         {initialData.parents.find(p => p.type === 'bride')?.father_photo && (
-                          <img 
-                            src={initialData.parents.find(p => p.type === 'bride')?.father_photo} 
-                            alt="Father" 
-                            className="w-12 h-12 rounded-full object-cover border mb-1 mx-auto"
-                            style={{ borderColor: `${theme.colors.primary}30` }}
-                          />
+                          <div className="relative w-12 h-12 rounded-full overflow-hidden border mb-1 mx-auto" style={{ borderColor: `${theme.colors.primary}30` }}>
+                            <Image 
+                              src={initialData.parents.find(p => p.type === 'bride')?.father_photo || ''} 
+                              alt="Father" 
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
                         )}
                         <p className="text-xs font-medium">Bapak {initialData.bride.fatherName || '-'}</p>
                       </div>
                       <div className="text-center">
                         {initialData.parents.find(p => p.type === 'bride')?.mother_photo && (
-                          <img 
-                            src={initialData.parents.find(p => p.type === 'bride')?.mother_photo} 
-                            alt="Mother" 
-                            className="w-12 h-12 rounded-full object-cover border mb-1 mx-auto"
-                            style={{ borderColor: `${theme.colors.primary}30` }}
-                          />
+                          <div className="relative w-12 h-12 rounded-full overflow-hidden border mb-1 mx-auto" style={{ borderColor: `${theme.colors.primary}30` }}>
+                            <Image 
+                              src={initialData.parents.find(p => p.type === 'bride')?.mother_photo || ''} 
+                              alt="Mother" 
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
                         )}
                         <p className="text-xs font-medium">Ibu {initialData.bride.motherName || '-'}</p>
                       </div>
@@ -692,12 +704,14 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                     <h3 className={`text-xl font-bold mt-1`} style={{ color: theme.colors.primary }}>{story.title}</h3>
                     
                     {story.image_url && (
-                      <img 
-                        src={story.image_url} 
-                        alt={story.title} 
-                        className="w-full max-h-48 object-cover rounded-xl mt-3 shadow-sm border"
-                        style={{ borderColor: `${theme.colors.primary}15` }}
-                      />
+                      <div className="relative w-full h-48 rounded-xl overflow-hidden mt-3 shadow-sm border" style={{ borderColor: `${theme.colors.primary}15` }}>
+                        <Image 
+                          src={story.image_url} 
+                          alt={story.title} 
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
                     )}
                     <p className="text-sm leading-relaxed mt-2.5 opacity-80">{story.description}</p>
                   </motion.div>
@@ -851,10 +865,11 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                       className="aspect-square relative rounded-xl overflow-hidden shadow-xs hover:shadow-md cursor-zoom-in group border"
                       style={{ borderColor: `${theme.colors.primary}20` }}
                     >
-                      <img 
+                      <Image 
                         src={item.image_url} 
                         alt=""
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </motion.div>
                   ))}
@@ -878,7 +893,7 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                               className="rounded-xl overflow-hidden cursor-zoom-in group border shadow-xs"
                               style={{ borderColor: `${theme.colors.primary}15` }}
                             >
-                              <img src={item.image_url} alt="" className="w-full h-auto object-cover group-hover:scale-103 transition-transform duration-500" />
+                              <Image src={item.image_url} alt="" width={500} height={500} className="w-full h-auto object-cover group-hover:scale-103 transition-transform duration-500" />
                             </div>
                           ))}
                         </div>
@@ -905,7 +920,7 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                               className="rounded-lg overflow-hidden cursor-zoom-in group bg-white p-2 border shadow-xs"
                               style={{ borderColor: `${theme.colors.primary}15` }}
                             >
-                              <img src={item.image_url} alt="" className="w-full h-auto object-cover rounded-md" />
+                              <Image src={item.image_url} alt="" width={500} height={500} className="w-full h-auto object-cover rounded-md" />
                               <p className="text-[10px] text-center mt-2 opacity-50 font-serif">Moment #{idx + 1}</p>
                             </div>
                           ))}
@@ -918,10 +933,11 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
 
               {galleryLayout === 'carousel' && (
                 <div className="w-full max-w-lg relative aspect-square rounded-2xl overflow-hidden border shadow-lg" style={{ borderColor: `${theme.colors.primary}20` }}>
-                  <img 
+                  <Image 
                     src={initialData.gallery[carouselIndex].image_url} 
                     alt="" 
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                   <div className="absolute inset-x-0 bottom-0 bg-black/40 backdrop-blur-xs py-4 flex items-center justify-between px-6 text-white">
                     <button onClick={prevCarouselSlide} className="p-2 bg-white/20 rounded-full hover:bg-white/30 cursor-pointer">
@@ -944,8 +960,8 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                       className="bg-white p-3 rounded-2xl border shadow-md flex flex-col cursor-zoom-in"
                       style={{ borderColor: `${theme.colors.primary}15` }}
                     >
-                      <div className="aspect-video w-full rounded-xl overflow-hidden">
-                        <img src={item.image_url} alt="" className="w-full h-full object-cover" />
+                      <div className="aspect-video w-full relative rounded-xl overflow-hidden">
+                        <Image src={item.image_url} alt="" fill className="object-cover" />
                       </div>
                       <span className="text-xs font-bold text-center mt-3 uppercase tracking-widest opacity-60">Album Foto #{idx + 1}</span>
                     </motion.div>
@@ -959,10 +975,10 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                     <div 
                       key={item.id || idx}
                       onClick={() => setLightboxImage(item.image_url)}
-                      className="snap-center shrink-0 w-64 aspect-square rounded-2xl overflow-hidden border shadow-sm cursor-zoom-in"
+                      className="snap-center shrink-0 w-64 aspect-square relative rounded-2xl overflow-hidden border shadow-sm cursor-zoom-in"
                       style={{ borderColor: `${theme.colors.primary}15` }}
                     >
-                      <img src={item.image_url} alt="" className="w-full h-full object-cover" />
+                      <Image src={item.image_url} alt="" fill className="object-cover" />
                     </div>
                   ))}
                 </div>
@@ -982,8 +998,8 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                           borderColor: '#E5DFD3'
                         }}
                       >
-                        <div className="aspect-square w-full bg-gray-100 overflow-hidden border border-gray-200">
-                          <img src={item.image_url} alt="" className="w-full h-full object-cover" />
+                        <div className="aspect-square w-full relative bg-gray-100 overflow-hidden border border-gray-200">
+                          <Image src={item.image_url} alt="" fill className="object-cover" />
                         </div>
                         <span className="text-center font-serif text-[#7C6B55] text-sm mt-4 tracking-wide font-classic-script">Happy Moment</span>
                       </div>
@@ -1047,10 +1063,12 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                     {gift.qris_image && (
                       <div className="mt-6 flex flex-col items-center border-t border-dashed pt-6" style={{ borderColor: `${theme.colors.primary}25` }}>
                         <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-3">QRIS Code</span>
-                        <img 
+                        <Image 
                           src={gift.qris_image} 
                           alt="QRIS Code"
-                          className="w-40 h-40 object-contain border p-2 rounded-xl"
+                          width={160}
+                          height={160}
+                          className="object-contain border p-2 rounded-xl"
                           style={{ borderColor: `${theme.colors.primary}20` }}
                         />
                       </div>
@@ -1276,14 +1294,15 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                 >
                   <X className="w-6 h-6" />
                 </button>
-                <motion.img
-                  initial={{ scale: 0.95 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0.95 }}
-                  src={lightboxImage}
-                  alt="Enlarged view"
-                  className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
-                />
+                <div className="relative w-full h-[80vh] flex items-center justify-center">
+                  <Image
+                    src={lightboxImage}
+                    alt="Enlarged view"
+                    width={1600}
+                    height={1200}
+                    className="w-auto h-auto max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+                  />
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

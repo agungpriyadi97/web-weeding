@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { WeddingData, WhatsAppTemplate } from '@/types/wedding';
-import { Check, Save, Info } from 'lucide-react';
+import { Save, Info } from 'lucide-react';
 
 interface WhatsAppTemplateManagerProps {
   weddingData: WeddingData;
   loadData: () => void;
 }
+
+const fallbackTemplate = `Kepada Yth.\nBapak/Ibu/Saudara/i\n*{{GUEST_NAME}}*\n\n*Assalamualaikum Warahmatullahi Wabarakatuh*\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{{GROOM_NAME}} & {{BRIDE_NAME}}*\n\nDetail undangan dapat diakses melalui tautan berikut:\n{{INVITATION_URL}}\n\nMerupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir dan memberikan doa restu.\n\n*Wassalamualaikum Warahmatullahi Wabarakatuh*\n\nTerima kasih.`;
 
 export default function WhatsAppTemplateManager({ weddingData, loadData }: WhatsAppTemplateManagerProps) {
   const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
@@ -15,8 +17,6 @@ export default function WhatsAppTemplateManager({ weddingData, loadData }: Whats
   const [editingText, setEditingText] = useState('');
   const [templateName, setTemplateName] = useState('');
   const [saving, setSaving] = useState(false);
-
-  const fallbackTemplate = `Kepada Yth.\nBapak/Ibu/Saudara/i\n*{{GUEST_NAME}}*\n\n*Assalamualaikum Warahmatullahi Wabarakatuh*\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{{GROOM_NAME}} & {{BRIDE_NAME}}*\n\nDetail undangan dapat diakses melalui tautan berikut:\n{{INVITATION_URL}}\n\nMerupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir dan memberikan doa restu.\n\n*Wassalamualaikum Warahmatullahi Wabarakatuh*\n\nTerima kasih.`;
 
   useEffect(() => {
     if (weddingData.whatsappTemplates && weddingData.whatsappTemplates.length > 0) {

@@ -46,8 +46,9 @@ export async function GET() {
       themeSettings,
       whatsappTemplates
     });
-  } catch (error: any) {
-    const message = error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Unknown error';
+  } catch (error: unknown) {
+    const errObj = error as Record<string, unknown> | null;
+    const message = errObj?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -90,8 +91,9 @@ export async function POST(request: Request) {
     }
     
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    const message = error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Unknown error';
+  } catch (error: unknown) {
+    const errObj = error as Record<string, unknown> | null;
+    const message = errObj?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

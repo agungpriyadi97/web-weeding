@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Lock, 
@@ -530,7 +531,7 @@ export default function AdminDashboard() {
   const handleDeleteRSVPItem = async (id: string) => {
     if (!confirm('Hapus tanggapan RSVP ini?')) return;
     try {
-      const res = await fetch(`/api/rsvp?id=${id}`, { method: 'DELETE' }); // Simulating delete query param
+      await fetch(`/api/rsvp?id=${id}`, { method: 'DELETE' }); // Simulating delete query param
       // Note: local db deletion wrapper
       const rsvpRes = await fetch('/api/rsvp');
       const data = await rsvpRes.json();
@@ -570,7 +571,7 @@ export default function AdminDashboard() {
   // -------------------------------------------------------------
   const handleToggleApproval = async (id: string, currentStatus: boolean) => {
     try {
-      const res = await fetch('/api/guestbook', {
+      await fetch('/api/guestbook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -851,7 +852,6 @@ export default function AdminDashboard() {
   };
 
   // RSVP Calculation stats
-  const totalGuestsResponse = rsvps.reduce((acc, curr) => acc + (curr.attendance ? Number(curr.guest_count) : 0), 0);
   const attendingCount = rsvps.filter(r => r.attendance).length;
   const nonAttendingCount = rsvps.filter(r => !r.attendance).length;
 
@@ -1056,12 +1056,12 @@ export default function AdminDashboard() {
               <div className="p-4 border border-dashed border-gold-200 rounded-xl flex flex-col items-center gap-4 bg-gold-50/5">
                 <span className="text-xs font-bold text-gold-700 uppercase tracking-wider">Foto Groom / Pria</span>
                 {infoForm.groom_image ? (
-                  <div className="relative">
-                    <img src={infoForm.groom_image} className="w-20 h-20 rounded-full object-cover border border-gold-300" alt="" />
+                  <div className="relative w-20 h-20 rounded-full overflow-hidden border border-gold-300">
+                    <Image src={infoForm.groom_image} alt="" fill className="object-cover" />
                     <button
                       type="button"
                       onClick={() => setInfoForm({ ...infoForm, groom_image: '' })}
-                      className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-1 shadow hover:bg-red-700 cursor-pointer"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 shadow hover:bg-red-700 cursor-pointer z-10"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -1079,12 +1079,12 @@ export default function AdminDashboard() {
               <div className="p-4 border border-dashed border-gold-200 rounded-xl flex flex-col items-center gap-4 bg-gold-50/5">
                 <span className="text-xs font-bold text-gold-700 uppercase tracking-wider">Foto Bride / Wanita</span>
                 {infoForm.bride_image ? (
-                  <div className="relative">
-                    <img src={infoForm.bride_image} className="w-20 h-20 rounded-full object-cover border border-gold-300" alt="" />
+                  <div className="relative w-20 h-20 rounded-full overflow-hidden border border-gold-300">
+                    <Image src={infoForm.bride_image} alt="" fill className="object-cover" />
                     <button
                       type="button"
                       onClick={() => setInfoForm({ ...infoForm, bride_image: '' })}
-                      className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-1 shadow hover:bg-red-700 cursor-pointer"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 shadow hover:bg-red-700 cursor-pointer z-10"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -1282,8 +1282,8 @@ export default function AdminDashboard() {
                     </div>
 
                     {parent.father_photo ? (
-                      <div className="relative">
-                        <img src={parent.father_photo} className="w-16 h-16 rounded-full object-cover border border-gold-200" alt="" />
+                      <div className="relative w-16 h-16 rounded-full overflow-hidden border border-gold-200">
+                        <Image src={parent.father_photo} alt="" fill className="object-cover" />
                         <button
                           type="button"
                           onClick={() => {
@@ -1291,9 +1291,9 @@ export default function AdminDashboard() {
                             updated[idx] = { ...updated[idx], father_photo: '' };
                             setParentsList(updated);
                           }}
-                          className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer"
+                          className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer z-10"
                         >
-                          <X className="w-3 h-3" />
+                          <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     ) : (
@@ -1328,8 +1328,8 @@ export default function AdminDashboard() {
                     </div>
 
                     {parent.mother_photo ? (
-                      <div className="relative">
-                        <img src={parent.mother_photo} className="w-16 h-16 rounded-full object-cover border border-gold-200" alt="" />
+                      <div className="relative w-16 h-16 rounded-full overflow-hidden border border-gold-200">
+                        <Image src={parent.mother_photo} alt="" fill className="object-cover" />
                         <button
                           type="button"
                           onClick={() => {
@@ -1337,7 +1337,7 @@ export default function AdminDashboard() {
                             updated[idx] = { ...updated[idx], mother_photo: '' };
                             setParentsList(updated);
                           }}
-                          className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer"
+                          className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer z-10"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -1387,7 +1387,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
               {weddingData?.gallery.map((item, idx) => (
                 <div key={item.id || idx} className="aspect-square relative rounded-xl overflow-hidden border border-gold-100 group shadow-xs">
-                  <img src={item.image_url} className="w-full h-full object-cover" alt="" />
+                  <Image src={item.image_url} alt="" fill className="object-cover" />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <button 
                       onClick={() => handleSortGalleryItem(idx, 'left')}
@@ -1513,7 +1513,7 @@ export default function AdminDashboard() {
                     <span className="text-[10px] font-bold text-gold-700 uppercase tracking-wider mb-2">QRIS Code</span>
                     {gift.qris_image ? (
                       <div className="relative group w-20 h-20 mb-2 border border-gold-100 p-1 rounded-lg">
-                        <img src={gift.qris_image} className="w-full h-full object-contain" alt="" />
+                        <Image src={gift.qris_image} alt="" fill className="object-contain" />
                         <button
                           type="button"
                           onClick={() => handleUpdateGiftField(idx, 'qris_image', '')}
@@ -2086,12 +2086,12 @@ export default function AdminDashboard() {
                   </label>
                 </div>
                 {infoForm.favicon && (
-                  <div className="relative">
-                    <img src={infoForm.favicon} className="w-10 h-10 object-contain border border-gold-200 p-1 bg-white rounded" alt="" />
+                  <div className="relative w-10 h-10 border border-gold-200 p-1 bg-white rounded overflow-hidden">
+                    <Image src={infoForm.favicon} alt="" fill className="object-contain" />
                     <button
                       type="button"
                       onClick={() => setInfoForm({ ...infoForm, favicon: '' })}
-                      className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer"
+                      className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer z-10"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -2108,12 +2108,12 @@ export default function AdminDashboard() {
                   </label>
                 </div>
                 {infoForm.hero_image && (
-                  <div className="relative">
-                    <img src={infoForm.hero_image} className="w-16 h-10 object-cover border border-gold-200 bg-white rounded" alt="" />
+                  <div className="relative w-16 h-10 border border-gold-200 bg-white rounded overflow-hidden">
+                    <Image src={infoForm.hero_image} alt="" fill className="object-cover" />
                     <button
                       type="button"
                       onClick={() => setInfoForm({ ...infoForm, hero_image: '', og_image: '' })}
-                      className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer z-10"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -2130,12 +2130,12 @@ export default function AdminDashboard() {
                   </label>
                 </div>
                 {infoForm.background_image && (
-                  <div className="relative">
-                    <img src={infoForm.background_image} className="w-16 h-10 object-cover border border-gold-200 bg-white rounded" alt="" />
+                  <div className="relative w-16 h-10 border border-gold-200 bg-white rounded overflow-hidden">
+                    <Image src={infoForm.background_image} alt="" fill className="object-cover" />
                     <button
                       type="button"
                       onClick={() => setInfoForm({ ...infoForm, background_image: '' })}
-                      className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer z-10"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -2237,7 +2237,7 @@ export default function AdminDashboard() {
                 </button>
                 
                 <h3 className="font-serif font-bold text-gray-800 text-lg text-center mb-4">Peta / Preview QR Code</h3>
-                <img src={qrCodeModalUrl} className="w-60 h-60 object-contain border border-gold-100 p-2 rounded-xl mb-4" alt="" />
+                <Image src={qrCodeModalUrl} alt="" width={240} height={240} className="object-contain border border-gold-100 p-2 rounded-xl mb-4" />
                 
                 <p className="text-xs text-gray-400 text-center leading-relaxed">
                   Tamu dapat melakukan scan pada QR code ini untuk membuka link undangan digital personal mereka secara instan.

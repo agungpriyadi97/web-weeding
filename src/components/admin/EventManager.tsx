@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { WeddingData, WeddingEvent } from '@/types/wedding';
-import { Plus, Trash2, Edit3, Check, Calendar, MapPin, Clock, ArrowUp, ArrowDown } from 'lucide-react';
+import { Trash2, Edit3, Check, Calendar, MapPin, Clock, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface EventManagerProps {
   weddingData: WeddingData;

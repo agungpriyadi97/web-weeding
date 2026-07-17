@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { WeddingData, LoveStory } from '@/types/wedding';
-import { Plus, Trash2, ArrowUp, ArrowDown, Edit3, Upload, Check, ImageIcon } from 'lucide-react';
+import { Trash2, ArrowUp, ArrowDown, Edit3, Upload, Check, ImageIcon } from 'lucide-react';
 
 interface LoveStoryManagerProps {
   weddingData: WeddingData;
@@ -222,7 +223,7 @@ export default function LoveStoryManager({ weddingData, loadData }: LoveStoryMan
             <div className="flex flex-col gap-3">
               {imageUrl && (
                 <div className="relative w-full h-32 rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
-                  <img src={imageUrl} alt="Upload preview" className="w-full h-full object-cover" />
+                  <Image src={imageUrl} alt="Upload preview" fill className="object-cover" />
                   <button
                     type="button"
                     onClick={() => setImageUrl('')}
@@ -287,7 +288,9 @@ export default function LoveStoryManager({ weddingData, loadData }: LoveStoryMan
               >
                 <div className="flex gap-4 items-center flex-grow text-left">
                   {story.image_url ? (
-                    <img src={story.image_url} alt="" className="w-16 h-16 rounded-xl object-cover border flex-shrink-0" />
+                    <div className="relative w-16 h-16 rounded-xl overflow-hidden border flex-shrink-0">
+                      <Image src={story.image_url} alt="" fill className="object-cover" />
+                    </div>
                   ) : (
                     <div className="w-16 h-16 rounded-xl bg-gold-50 border border-gold-200 flex items-center justify-center flex-shrink-0 text-gold-500">
                       <ImageIcon className="w-6 h-6" />
