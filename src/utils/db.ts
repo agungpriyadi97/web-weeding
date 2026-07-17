@@ -519,7 +519,35 @@ export async function getEvents(): Promise<WeddingEvent[]> {
     console.error('Supabase getEvents error:', error.message);
     return [];
   }
-  return data || [];
+  if (!data || data.length === 0) {
+    const defaultEvents = [
+      {
+        name: 'Akad Nikah',
+        event_date: '2026-12-25',
+        event_time: '08:00 - 10:00 WIB',
+        location: 'Sasana Kriya, TMII',
+        address: 'Taman Mini Indonesia Indah, Jakarta',
+        google_maps_url: 'https://maps.google.com',
+        sort_order: 0
+      },
+      {
+        name: 'Resepsi Pernikahan',
+        event_date: '2026-12-25',
+        event_time: '11:00 - 13:00 WIB',
+        location: 'Sasana Kriya, TMII',
+        address: 'Taman Mini Indonesia Indah, Jakarta',
+        google_maps_url: 'https://maps.google.com',
+        sort_order: 1
+      }
+    ];
+    const { data: inserted, error: insertError } = await db.from('events').insert(defaultEvents).select();
+    if (insertError) {
+      console.error('Supabase default events insert error:', insertError.message);
+      return [];
+    }
+    return inserted || [];
+  }
+  return data;
 }
 
 export async function updateEvents(events: WeddingEvent[]): Promise<WeddingEvent[]> {
@@ -561,7 +589,38 @@ export async function getLoveStories(): Promise<LoveStory[]> {
     console.error('Supabase getLoveStories error:', error.message);
     return [];
   }
-  return data || [];
+  if (!data || data.length === 0) {
+    const defaultStories = [
+      {
+        title: 'Pertama Bertemu',
+        story_date: '15 Januari 2024',
+        description: 'Pertemuan pertama kami yang tidak disengaja di sebuah kedai kopi hangat di sudut kota. Percakapan singkat hari itu menuntun kami pada obrolan-obrolan panjang berikutnya.',
+        image_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=60',
+        sort_order: 0
+      },
+      {
+        title: 'Ikatan Janji (Lamaran)',
+        story_date: '20 Juni 2025',
+        description: 'Setelah melewati berbagai cerita suka dan duka bersama, kami memutuskan untuk melangkah ke komitmen yang lebih serius. Lamaran resmi dihadiri oleh keluarga besar kami tercinta.',
+        image_url: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800&auto=format&fit=crop&q=60',
+        sort_order: 1
+      },
+      {
+        title: 'Hari Bahagia (Pernikahan)',
+        story_date: '25 Desember 2026',
+        description: 'Hari bersejarah di mana kami berdua mengucapkan janji suci pernikahan untuk memulai babak baru kehidupan bersama sebagai pasangan suami istri.',
+        image_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=60',
+        sort_order: 2
+      }
+    ];
+    const { data: inserted, error: insertError } = await db.from('love_story').insert(defaultStories).select();
+    if (insertError) {
+      console.error('Supabase default love stories insert error:', insertError.message);
+      return [];
+    }
+    return inserted || [];
+  }
+  return data;
 }
 
 export async function updateLoveStories(stories: LoveStory[]): Promise<LoveStory[]> {

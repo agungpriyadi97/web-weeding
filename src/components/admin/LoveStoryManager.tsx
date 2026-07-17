@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { WeddingData, LoveStory } from '@/types/wedding';
 import { Trash2, ArrowUp, ArrowDown, Edit3, Upload, Check, ImageIcon } from 'lucide-react';
+import { uploadFile } from '@/utils/upload';
 
 interface LoveStoryManagerProps {
   weddingData: WeddingData;
@@ -36,20 +37,11 @@ export default function LoveStoryManager({ weddingData, loadData }: LoveStoryMan
 
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('bucket', 'wedding-info');
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        setImageUrl(json.url);
-      }
-    } catch (err) {
+      const url = await uploadFile(file, 'wedding-info');
+      setImageUrl(url);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Gagal mengupload foto.';
+      alert(msg);
       console.error('Failed to upload image:', err);
     } finally {
       setUploading(false);

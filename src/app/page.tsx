@@ -1,5 +1,5 @@
 import InvitationPage from '@/components/InvitationPage';
-import { getWeddingInfo, getParents, getGallery, getGiftAccounts, getGuests } from '@/utils/db';
+import { getWeddingInfo, getParents, getGallery, getGiftAccounts, getGuests, getLoveStories, getEvents, getThemeSettings } from '@/utils/db';
 import { WeddingData } from '@/types/wedding';
 
 interface PageProps {
@@ -15,6 +15,9 @@ export default async function Home({ searchParams }: PageProps) {
   const gallery = await getGallery();
   const giftAccounts = await getGiftAccounts();
   const guests = await getGuests();
+  const loveStories = await getLoveStories();
+  const events = await getEvents();
+  const themeSettings = await getThemeSettings();
 
   const initialData: WeddingData = {
     groom: {
@@ -39,7 +42,10 @@ export default async function Home({ searchParams }: PageProps) {
     giftAccounts,
     guests,
     closingMessage: info.closing_message || '',
+    loveStories,
+    events,
+    themeSettings,
   };
 
-  return <InvitationPage initialData={initialData} guestName={guestName} />;
+  return <InvitationPage initialData={initialData} guestName={guestName} />;// Render the invitation page
 }
