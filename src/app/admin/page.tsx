@@ -109,7 +109,35 @@ export default function AdminDashboard() {
           closingMessage: ''
         });
       } else {
-        setWeddingData(dataJson);
+        const mappedData: WeddingData = {
+          groom: {
+            namaLengkap: dataJson.info?.groom_name || '',
+            namaPanggilan: dataJson.info?.groom_nickname || '',
+            fatherName: dataJson.parents?.find((p: ParentDetail) => p.type === 'groom')?.father_name,
+            motherName: dataJson.parents?.find((p: ParentDetail) => p.type === 'groom')?.mother_name,
+            fatherPhoto: dataJson.parents?.find((p: ParentDetail) => p.type === 'groom')?.father_photo,
+            motherPhoto: dataJson.parents?.find((p: ParentDetail) => p.type === 'groom')?.mother_photo,
+          },
+          bride: {
+            namaLengkap: dataJson.info?.bride_name || '',
+            namaPanggilan: dataJson.info?.bride_nickname || '',
+            fatherName: dataJson.parents?.find((p: ParentDetail) => p.type === 'bride')?.father_name,
+            motherName: dataJson.parents?.find((p: ParentDetail) => p.type === 'bride')?.mother_name,
+            fatherPhoto: dataJson.parents?.find((p: ParentDetail) => p.type === 'bride')?.father_photo,
+            motherPhoto: dataJson.parents?.find((p: ParentDetail) => p.type === 'bride')?.mother_photo,
+          },
+          event: dataJson.info || {},
+          parents: dataJson.parents || [],
+          gallery: dataJson.gallery || [],
+          giftAccounts: dataJson.giftAccounts || [],
+          guests: dataJson.guests || [],
+          closingMessage: dataJson.info?.closing_message || '',
+          loveStories: dataJson.loveStories || [],
+          events: dataJson.events || [],
+          whatsappTemplates: dataJson.whatsappTemplates || [],
+          themeSettings: dataJson.themeSettings,
+        };
+        setWeddingData(mappedData);
         
         if (dataJson.info) {
           const infoWithDefaults = {

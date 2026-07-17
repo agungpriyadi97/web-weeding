@@ -138,8 +138,30 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
   const [guestbookSubmitting, setGuestbookSubmitting] = useState(false);
 
   // Active theme selection
-  const currentThemeKey = previewThemeId || initialData.event.theme || 'elegant-gold';
-  const theme = getThemeConfig(currentThemeKey);
+  const currentThemeKey = previewThemeId || initialData.event?.theme || 'elegant-gold';
+  let theme = getThemeConfig(currentThemeKey);
+  if (!theme) {
+    theme = getThemeConfig('elegant-gold');
+  }
+
+  // Extract or build groom/bride details to be fully compatible with both mapped and raw data formats
+  const groom = initialData.groom || {
+    namaLengkap: initialData.event?.groom_name || '',
+    namaPanggilan: initialData.event?.groom_nickname || '',
+    fatherName: initialData.parents?.find(p => p.type === 'groom')?.father_name,
+    motherName: initialData.parents?.find(p => p.type === 'groom')?.mother_name,
+    fatherPhoto: initialData.parents?.find(p => p.type === 'groom')?.father_photo,
+    motherPhoto: initialData.parents?.find(p => p.type === 'groom')?.mother_photo,
+  };
+
+  const bride = initialData.bride || {
+    namaLengkap: initialData.event?.bride_name || '',
+    namaPanggilan: initialData.event?.bride_nickname || '',
+    fatherName: initialData.parents?.find(p => p.type === 'bride')?.father_name,
+    motherName: initialData.parents?.find(p => p.type === 'bride')?.mother_name,
+    fatherPhoto: initialData.parents?.find(p => p.type === 'bride')?.father_photo,
+    motherPhoto: initialData.parents?.find(p => p.type === 'bride')?.mother_photo,
+  };
 
   // Layout configs
   const galleryLayout = initialData.themeSettings?.gallery_layout || 'grid';
@@ -401,6 +423,14 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
     );
   }
 
+  if (!theme || !initialData) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center text-red-500 font-bold min-h-[200px] bg-white">
+        Preview is not available.
+      </div>
+    );
+  }
+
   return (
     <div className={`relative overflow-x-hidden min-h-screen ${theme.classes.bodyBg} ${theme.fontBody} ${theme.classes.text} antialiased`}>
       {/* Inject custom variables in inline stylesheet */}
@@ -444,7 +474,7 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
               <span className={`text-white/80 font-medium uppercase tracking-widest text-xs ${theme.fontBody}`}>Wedding Invitation</span>
               <div className="w-12 h-px bg-white/30 my-3" />
               <h1 className={`text-4xl sm:text-5xl md:text-6xl text-white font-bold tracking-wide mt-2 drop-shadow-md ${theme.fontHeading}`}>
-                {initialData.groom.namaPanggilan} & {initialData.bride.namaPanggilan}
+                {groom.namaPanggilan} & {bride.namaPanggilan}
               </h1>
             </div>
 
@@ -502,7 +532,7 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
               <span className={`text-xs uppercase tracking-widest font-bold mb-4`} style={{ color: theme.colors.primary }}>Undangan Pernikahan</span>
               
               <h2 className={`text-5xl sm:text-6xl md:text-7xl font-bold tracking-wide my-6 ${theme.classes.heading} ${theme.fontHeading}`}>
-                {initialData.groom.namaPanggilan} & {initialData.bride.namaPanggilan}
+                {groom.namaPanggilan} & {bride.namaPanggilan}
               </h2>
               
               <p className="text-xs sm:text-sm font-semibold tracking-widest uppercase mt-4 opacity-80">
@@ -563,7 +593,7 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                   <div className="relative w-28 h-28 mb-6 shadow-md border-2 rounded-full overflow-hidden" style={{ borderColor: theme.colors.primary }}>
                     <Image 
                       src={initialData.event.groom_image} 
-                      alt={initialData.groom.namaLengkap} 
+                      alt={groom.namaLengkap} 
                       fill
                       className="object-cover"
                     />
@@ -573,10 +603,10 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                     G
                   </div>
                 )}
-                <h3 className={`text-2xl font-bold ${theme.fontHeading}`}>{initialData.groom.namaLengkap}</h3>
+                <h3 className={`text-2xl font-bold ${theme.fontHeading}`}>{groom.namaLengkap}</h3>
                 <p className="text-xs font-semibold tracking-widest uppercase mt-1 opacity-70">Mempelai Pria</p>
                 
-                {(initialData.groom.fatherName || initialData.groom.motherName) && (
+                {(groom.fatherName || groom.motherName) && (
                   <div className="text-sm mt-6 pt-4 border-t border-dashed w-full flex flex-col items-center gap-2" style={{ borderColor: `${theme.colors.primary}20` }}>
                     <p className="font-semibold text-[10px] uppercase tracking-widest opacity-40">Putra dari:</p>
                     
@@ -592,7 +622,7 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                             />
                           </div>
                         )}
-                        <p className="text-xs font-medium">Bapak {initialData.groom.fatherName || '-'}</p>
+                        <p className="text-xs font-medium">Bapak {groom.fatherName || '-'}</p>
                       </div>
                       <div className="text-center">
                         {initialData.parents.find(p => p.type === 'groom')?.mother_photo && (
@@ -605,7 +635,7 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                             />
                           </div>
                         )}
-                        <p className="text-xs font-medium">Ibu {initialData.groom.motherName || '-'}</p>
+                        <p className="text-xs font-medium">Ibu {groom.motherName || '-'}</p>
                       </div>
                     </div>
                   </div>
@@ -624,7 +654,7 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                   <div className="relative w-28 h-28 mb-6 shadow-md border-2 rounded-full overflow-hidden" style={{ borderColor: theme.colors.primary }}>
                     <Image 
                       src={initialData.event.bride_image} 
-                      alt={initialData.bride.namaLengkap} 
+                      alt={bride.namaLengkap} 
                       fill
                       className="object-cover"
                     />
@@ -634,10 +664,10 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                     B
                   </div>
                 )}
-                <h3 className={`text-2xl font-bold ${theme.fontHeading}`}>{initialData.bride.namaLengkap}</h3>
+                <h3 className={`text-2xl font-bold ${theme.fontHeading}`}>{bride.namaLengkap}</h3>
                 <p className="text-xs font-semibold tracking-widest uppercase mt-1 opacity-70">Mempelai Wanita</p>
 
-                {(initialData.bride.fatherName || initialData.bride.motherName) && (
+                {(bride.fatherName || bride.motherName) && (
                   <div className="text-sm mt-6 pt-4 border-t border-dashed w-full flex flex-col items-center gap-2" style={{ borderColor: `${theme.colors.primary}20` }}>
                     <p className="font-semibold text-[10px] uppercase tracking-widest opacity-40">Putri dari:</p>
                     
@@ -653,7 +683,7 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                             />
                           </div>
                         )}
-                        <p className="text-xs font-medium">Bapak {initialData.bride.fatherName || '-'}</p>
+                        <p className="text-xs font-medium">Bapak {bride.fatherName || '-'}</p>
                       </div>
                       <div className="text-center">
                         {initialData.parents.find(p => p.type === 'bride')?.mother_photo && (
@@ -666,7 +696,7 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                             />
                           </div>
                         )}
-                        <p className="text-xs font-medium">Ibu {initialData.bride.motherName || '-'}</p>
+                        <p className="text-xs font-medium">Ibu {bride.motherName || '-'}</p>
                       </div>
                     </div>
                   </div>
