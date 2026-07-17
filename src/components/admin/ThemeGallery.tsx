@@ -211,26 +211,26 @@ export default function ThemeGallery({ weddingData, loadData }: ThemeGalleryProp
             className="fixed inset-0 z-50 bg-black/60 flex flex-col justify-end sm:justify-center p-0 sm:p-4"
           >
             {/* Header controls bar */}
-            <div className="bg-white/95 border-b border-gray-100 p-4 flex items-center justify-between shadow-md relative z-10 w-full max-w-5xl mx-auto rounded-t-2xl sm:rounded-2xl sm:mb-2 flex-shrink-0">
-              <div className="flex items-center gap-3">
+            <div className="bg-white/95 border-b border-gray-100 p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-md relative z-10 w-full max-w-5xl mx-auto rounded-t-2xl sm:rounded-2xl sm:mb-2 flex-shrink-0">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-serif font-bold text-gray-800">Preview Tema:</span>
                 <span className="px-3 py-1 bg-gold-50 border border-gold-200 text-gold-700 text-xs font-bold rounded-full">
                   {themes.find(t => t.id === previewThemeId)?.name}
                 </span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                 <button
                   onClick={() => {
                     handleApplyTheme(previewThemeId);
                     setPreviewThemeId(null);
                   }}
-                  className="px-5 py-2 rounded-full bg-gold-500 hover:bg-gold-600 text-white font-bold text-xs tracking-widest uppercase cursor-pointer"
+                  className="flex-grow sm:flex-grow-0 px-5 py-2 rounded-full bg-gold-500 hover:bg-gold-600 text-white font-bold text-xs tracking-widest uppercase cursor-pointer text-center"
                 >
                   Gunakan Tema Ini
                 </button>
                 <button
                   onClick={() => setPreviewThemeId(null)}
-                  className="p-2 rounded-full hover:bg-gray-100 text-gray-400 cursor-pointer"
+                  className="p-2 rounded-full hover:bg-gray-100 text-gray-400 cursor-pointer shrink-0"
                 >
                   <X className="w-5 h-5" />
                 </button>

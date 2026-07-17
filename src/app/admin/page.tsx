@@ -891,7 +891,7 @@ export default function AdminDashboard() {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md bg-white p-8 rounded-2xl border border-gold-200 shadow-xl flex flex-col items-center">
+        <div className="w-full max-w-md bg-white p-4 sm:p-8 rounded-2xl border border-gold-200 shadow-xl flex flex-col items-center">
           <div className="w-16 h-16 bg-gold-50 border border-gold-300 rounded-full flex items-center justify-center text-gold-600 mb-6">
             <Lock className="w-8 h-8" />
           </div>
@@ -1111,7 +1111,7 @@ export default function AdminDashboard() {
 
         {/* 2. WEDDING INFORMATION */}
         {activeTab === 'info' && (
-          <form onSubmit={handleSaveInfo} className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-gold-100 shadow-sm">
+          <form onSubmit={handleSaveInfo} className="flex flex-col gap-6 bg-white p-4 sm:p-8 rounded-2xl border border-gold-100 shadow-sm">
             <div>
               <h2 className="text-2xl font-serif font-bold text-gold-800">Informasi Mempelai & Acara</h2>
               <p className="text-xs text-gray-400 mt-1">Ubah nama, tanggal, lokasi acara, dan upload foto mempelai pria/wanita.</p>
@@ -1308,7 +1308,7 @@ export default function AdminDashboard() {
 
         {/* 3. PARENTS DETAILS & PHOTO UPLOADS */}
         {activeTab === 'parents' && (
-          <form onSubmit={handleSaveInfo} className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-gold-100 shadow-sm">
+          <form onSubmit={handleSaveInfo} className="flex flex-col gap-6 bg-white p-4 sm:p-8 rounded-2xl border border-gold-100 shadow-sm">
             <div>
               <h2 className="text-2xl font-serif font-bold text-gold-800">Orang Tua & Foto Keluarga</h2>
               <p className="text-xs text-gray-400 mt-1">Kelola nama dan upload foto orang tua/wali masing-masing mempelai.</p>
@@ -1322,8 +1322,8 @@ export default function AdminDashboard() {
                   </span>
 
                   {/* Father fields */}
-                  <div className="flex items-center gap-4 border-b border-dashed border-gold-200/50 pb-4">
-                    <div className="flex-grow flex flex-col gap-3">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 border-b border-dashed border-gold-200/50 pb-4 w-full">
+                    <div className="flex-grow flex flex-col gap-3 w-full">
                       <div>
                         <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Nama Ayah</label>
                         <input
@@ -1368,8 +1368,8 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Mother fields */}
-                  <div className="flex items-center gap-4 pt-2">
-                    <div className="flex-grow flex flex-col gap-3">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 pt-2 w-full">
+                    <div className="flex-grow flex flex-col gap-3 w-full">
                       <div>
                         <label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Nama Ibu</label>
                         <input
@@ -1429,14 +1429,14 @@ export default function AdminDashboard() {
 
         {/* 4. UPGRADED GALLERY SECTION */}
         {activeTab === 'gallery' && (
-          <div className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-gold-100 shadow-sm">
+          <div className="flex flex-col gap-6 bg-white p-4 sm:p-8 rounded-2xl border border-gold-100 shadow-sm">
             <div>
               <h2 className="text-2xl font-serif font-bold text-gold-800">Gallery Photo Manager</h2>
               <p className="text-xs text-gray-400 mt-1">Upload multiple prewedding pictures. Drag & Drop upload falls back to local server if Supabase is unconfigured.</p>
             </div>
 
             {/* Drag and drop uploader box */}
-            <div className="p-8 border-2 border-dashed border-gold-200 hover:border-gold-400 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-colors relative bg-gold-50/5">
+            <div className="p-4 sm:p-8 border-2 border-dashed border-gold-200 hover:border-gold-400 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-colors relative bg-gold-50/5">
               <Upload className="w-8 h-8 text-gold-500 mb-3" />
               <p className="text-sm font-semibold text-gray-700">Drag & Drop file foto Anda di sini</p>
               <p className="text-xs text-gray-400 mt-1">Mendukung format PNG, JPG, JPEG. Bisa upload banyak file sekaligus.</p>
@@ -1454,7 +1454,7 @@ export default function AdminDashboard() {
               {weddingData?.gallery.map((item, idx) => (
                 <div key={item.id || idx} className="aspect-square relative rounded-xl overflow-hidden border border-gold-100 group shadow-xs">
                   <Image src={item.image_url} alt="" fill className="object-cover" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <div className="absolute inset-0 bg-black/35 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity flex flex-wrap items-center justify-center gap-1.5 p-1.5">
                     <button
                       onClick={() => handleSortGalleryItem(idx, 'left')}
                       disabled={idx === 0}
@@ -1494,8 +1494,8 @@ export default function AdminDashboard() {
 
         {/* 5. MULTIPLE BANK ACCOUNT MANAGEMENT & QRIS */}
         {activeTab === 'gifts' && (
-          <form onSubmit={handleSaveInfo} className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-gold-100 shadow-sm">
-            <div className="flex justify-between items-center border-b border-gold-50 pb-4">
+          <form onSubmit={handleSaveInfo} className="flex flex-col gap-6 bg-white p-4 sm:p-8 rounded-2xl border border-gold-100 shadow-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gold-50 pb-4">
               <div>
                 <h2 className="text-2xl font-serif font-bold text-gold-800">Amplop Digital / Angpau</h2>
                 <p className="text-xs text-gray-400 mt-1">Kelola beberapa rekening bank penerima hadiah, urutkan rekening, dan upload QRIS.</p>
@@ -1503,7 +1503,7 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={handleAddGiftAccount}
-                className="px-4 py-2 rounded-lg bg-gold-500 hover:bg-gold-600 text-white font-bold text-xs uppercase tracking-wider cursor-pointer flex items-center gap-1 shadow-sm shrink-0"
+                className="w-full sm:w-auto px-4 py-2 rounded-lg bg-gold-500 hover:bg-gold-600 text-white font-bold text-xs uppercase tracking-wider cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"
               >
                 <Plus className="w-4 h-4" /> Tambah Rekening
               </button>
@@ -1511,97 +1511,106 @@ export default function AdminDashboard() {
 
             <div className="flex flex-col gap-6 mt-4">
               {giftsList.map((gift, idx) => (
-                <div key={gift.id || idx} className="p-6 rounded-xl border border-gold-100 bg-[#FDFCF9]/30 relative flex flex-col sm:flex-row gap-6">
-                  {/* Sorting inputs & deletion panel */}
-                  <div className="absolute top-4 right-4 flex items-center gap-2">
-                    <button
-                      type="button"
-                      disabled={idx === 0}
-                      onClick={() => handleSortGifts(idx, 'up')}
-                      className="p-1.5 border border-gold-200 hover:bg-gold-50 text-gold-600 disabled:opacity-30 rounded cursor-pointer"
-                    >
-                      ▲
-                    </button>
-                    <button
-                      type="button"
-                      disabled={idx === giftsList.length - 1}
-                      onClick={() => handleSortGifts(idx, 'down')}
-                      className="p-1.5 border border-gold-200 hover:bg-gold-50 text-gold-600 disabled:opacity-30 rounded cursor-pointer"
-                    >
-                      ▼
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteGiftAccount(idx)}
-                      className="p-1.5 border border-red-200 hover:bg-red-50 text-red-500 rounded cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  {/* Form fields */}
-                  <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Nama Bank / E-Wallet</label>
-                      <input
-                        type="text"
-                        required
-                        value={gift.bank_name || ''}
-                        onChange={(e) => handleUpdateGiftField(idx, 'bank_name', e.target.value)}
-                        className="w-full px-3 py-2 rounded-md border border-gold-100 text-sm focus:outline-none focus:ring-1 focus:ring-gold-400"
-                        placeholder="BCA, Mandiri, OVO, ShopeePay..."
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Nomor Rekening</label>
-                      <input
-                        type="text"
-                        required
-                        value={gift.account_number || ''}
-                        onChange={(e) => handleUpdateGiftField(idx, 'account_number', e.target.value)}
-                        className="w-full px-3 py-2 rounded-md border border-gold-100 text-sm focus:outline-none focus:ring-1 focus:ring-gold-400 font-mono"
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Nama Pemilik Rekening</label>
-                      <input
-                        type="text"
-                        required
-                        value={gift.account_holder || ''}
-                        onChange={(e) => handleUpdateGiftField(idx, 'account_holder', e.target.value)}
-                        className="w-full px-3 py-2 rounded-md border border-gold-100 text-sm focus:outline-none focus:ring-1 focus:ring-gold-400"
-                      />
+                <div key={gift.id || idx} className="p-4 sm:p-6 rounded-xl border border-gold-100 bg-[#FDFCF9]/30 flex flex-col gap-4">
+                  {/* Sorting & deletion header panel */}
+                  <div className="flex justify-between items-center border-b border-gold-50 pb-3">
+                    <span className="text-xs font-bold text-gold-600 uppercase tracking-widest">Rekening #{idx + 1}</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={idx === 0}
+                        onClick={() => handleSortGifts(idx, 'up')}
+                        className="p-1.5 border border-gold-200 hover:bg-gold-50 text-gold-600 disabled:opacity-30 rounded cursor-pointer"
+                        title="Geser Ke Atas"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        disabled={idx === giftsList.length - 1}
+                        onClick={() => handleSortGifts(idx, 'down')}
+                        className="p-1.5 border border-gold-200 hover:bg-gold-50 text-gold-600 disabled:opacity-30 rounded cursor-pointer"
+                        title="Geser Ke Bawah"
+                      >
+                        ▼
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteGiftAccount(idx)}
+                        className="p-1.5 border border-red-200 hover:bg-red-50 text-red-500 rounded cursor-pointer"
+                        title="Hapus"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
 
-                  {/* QRIS Upload Box */}
-                  <div className="flex flex-col items-center justify-center p-4 border border-dashed border-gold-200 rounded-xl bg-white shrink-0 sm:w-44 text-center">
-                    <span className="text-[10px] font-bold text-gold-700 uppercase tracking-wider mb-2">QRIS Code</span>
-                    {gift.qris_image ? (
-                      <div className="relative group w-20 h-20 mb-2 border border-gold-100 p-1 rounded-lg">
-                        <Image src={gift.qris_image} alt="" fill className="object-contain" />
-                        <button
-                          type="button"
-                          onClick={() => handleUpdateGiftField(idx, 'qris_image', '')}
-                          className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-1 shadow hover:bg-red-700 cursor-pointer"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
+                  {/* Body fields & QRIS */}
+                  <div className="flex flex-col md:flex-row gap-6 w-full items-stretch md:items-center">
+                    {/* Form fields */}
+                    <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Nama Bank / E-Wallet</label>
+                        <input
+                          type="text"
+                          required
+                          value={gift.bank_name || ''}
+                          onChange={(e) => handleUpdateGiftField(idx, 'bank_name', e.target.value)}
+                          className="w-full px-3 py-2 rounded-md border border-gold-100 text-sm focus:outline-none focus:ring-1 focus:ring-gold-400"
+                          placeholder="BCA, Mandiri, OVO, ShopeePay..."
+                        />
                       </div>
-                    ) : (
-                      <div className="w-16 h-16 border border-dashed border-gold-200 rounded-lg flex items-center justify-center text-gold-400 mb-2">
-                        <ImageIcon className="w-6 h-6" />
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Nomor Rekening</label>
+                        <input
+                          type="text"
+                          required
+                          value={gift.account_number || ''}
+                          onChange={(e) => handleUpdateGiftField(idx, 'account_number', e.target.value)}
+                          className="w-full px-3 py-2 rounded-md border border-gold-100 text-sm focus:outline-none focus:ring-1 focus:ring-gold-400 font-mono"
+                        />
                       </div>
-                    )}
-                    <label className="px-3 py-1 bg-gold-50 border border-gold-300 rounded hover:bg-gold-100 text-[10px] font-bold text-gold-600 tracking-wider uppercase cursor-pointer flex items-center gap-1">
-                      <Upload className="w-3 h-3" /> Upload QRIS
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => handleImageUpload(e, 'qris', `gift_accounts:${idx}:qris_image`, (url) => handleUpdateGiftField(idx, 'qris_image', url))}
-                      />
-                    </label>
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Nama Pemilik Rekening</label>
+                        <input
+                          type="text"
+                          required
+                          value={gift.account_holder || ''}
+                          onChange={(e) => handleUpdateGiftField(idx, 'account_holder', e.target.value)}
+                          className="w-full px-3 py-2 rounded-md border border-gold-100 text-sm focus:outline-none focus:ring-1 focus:ring-gold-400"
+                        />
+                      </div>
+                    </div>
+
+                    {/* QRIS Upload Box */}
+                    <div className="flex flex-col items-center justify-center p-4 border border-dashed border-gold-200 rounded-xl bg-white shrink-0 md:w-44 text-center">
+                      <span className="text-[10px] font-bold text-gold-700 uppercase tracking-wider mb-2">QRIS Code</span>
+                      {gift.qris_image ? (
+                        <div className="relative group w-20 h-20 mb-2 border border-gold-100 p-1 rounded-lg">
+                          <Image src={gift.qris_image} alt="" fill className="object-contain" />
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateGiftField(idx, 'qris_image', '')}
+                            className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-1 shadow hover:bg-red-700 cursor-pointer"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-16 h-16 border border-dashed border-gold-200 rounded-lg flex items-center justify-center text-gold-400 mb-2">
+                          <ImageIcon className="w-6 h-6" />
+                        </div>
+                      )}
+                      <label className="px-3 py-1 bg-gold-50 border border-gold-300 rounded hover:bg-gold-100 text-[10px] font-bold text-gold-600 tracking-wider uppercase cursor-pointer flex items-center gap-1 w-full justify-center">
+                        <Upload className="w-3 h-3" /> Upload QRIS
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleImageUpload(e, 'qris', `gift_accounts:${idx}:qris_image`, (url) => handleUpdateGiftField(idx, 'qris_image', url))}
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1624,23 +1633,23 @@ export default function AdminDashboard() {
 
         {/* 6. ADVANCED RSVP MANAGEMENT & FILTERS */}
         {activeTab === 'rsvps' && (
-          <div className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-gold-100 shadow-sm overflow-hidden">
+          <div className="flex flex-col gap-6 bg-white p-4 sm:p-8 rounded-2xl border border-gold-100 shadow-sm overflow-hidden">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gold-50 pb-4">
               <div>
                 <h2 className="text-2xl font-serif font-bold text-gold-800">RSVP Manager</h2>
                 <p className="text-xs text-gray-400 mt-1">Audit konfirmasi kehadiran tamu. Saring, cetak, dan ekspor data.</p>
               </div>
 
-              <div className="flex gap-2 shrink-0">
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto shrink-0">
                 <button
                   onClick={handleExportRsvpsToCSV}
-                  className="px-4 py-2 border border-gold-300 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                  className="flex-grow sm:flex-grow-0 px-4 py-2 border border-gold-300 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <FileSpreadsheet className="w-4 h-4" /> Export CSV
                 </button>
                 <button
                   onClick={handlePrintRSVPs}
-                  className="px-4 py-2 border border-gold-300 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                  className="flex-grow sm:flex-grow-0 px-4 py-2 border border-gold-300 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Printer className="w-4 h-4" /> Print Report
                 </button>
@@ -1658,22 +1667,22 @@ export default function AdminDashboard() {
                   className="w-full px-4 py-2 rounded-lg border border-gold-100 text-sm focus:outline-none focus:ring-1 focus:ring-gold-400 bg-white"
                 />
               </div>
-              <div className="flex gap-2 w-full sm:w-auto shrink-0">
+              <div className="grid grid-cols-3 gap-2 w-full sm:w-auto shrink-0">
                 <button
                   onClick={() => setRsvpFilter('all')}
-                  className={`px-4 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${rsvpFilter === 'all' ? 'bg-gold-500 border-gold-500 text-white' : 'bg-white border-gold-200 text-gold-600 hover:bg-gold-50'}`}
+                  className={`px-3 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer text-center ${rsvpFilter === 'all' ? 'bg-gold-500 border-gold-500 text-white' : 'bg-white border-gold-200 text-gold-600 hover:bg-gold-50'}`}
                 >
                   Semua
                 </button>
                 <button
                   onClick={() => setRsvpFilter('hadir')}
-                  className={`px-4 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${rsvpFilter === 'hadir' ? 'bg-green-600 border-green-600 text-white' : 'bg-white border-gold-200 text-gold-600 hover:bg-gold-50'}`}
+                  className={`px-3 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer text-center ${rsvpFilter === 'hadir' ? 'bg-green-600 border-green-600 text-white' : 'bg-white border-gold-200 text-gold-600 hover:bg-gold-50'}`}
                 >
                   Hadir
                 </button>
                 <button
                   onClick={() => setRsvpFilter('absen')}
-                  className={`px-4 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${rsvpFilter === 'absen' ? 'bg-red-500 border-red-500 text-white' : 'bg-white border-gold-200 text-gold-600 hover:bg-gold-50'}`}
+                  className={`px-3 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer text-center ${rsvpFilter === 'absen' ? 'bg-red-500 border-red-500 text-white' : 'bg-white border-gold-200 text-gold-600 hover:bg-gold-50'}`}
                 >
                   Absen
                 </button>
@@ -1684,31 +1693,31 @@ export default function AdminDashboard() {
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
                   <tr className="border-b border-gold-100 text-gold-800 font-bold uppercase tracking-wider text-xs bg-gold-50/20">
-                    <th className="py-3 px-4">Nama Tamu</th>
-                    <th className="py-3 px-4">Kehadiran</th>
-                    <th className="py-3 px-4">Pax</th>
-                    <th className="py-3 px-4">Pesan Restu</th>
-                    <th className="py-3 px-4">Waktu</th>
-                    <th className="py-3 px-4 text-right">Aksi</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Nama Tamu</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Kehadiran</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Pax</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Pesan Restu</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Waktu</th>
+                    <th className="py-3 px-4 text-right whitespace-nowrap">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredRsvps.map((rsvp, idx) => (
                     <tr key={rsvp.id || idx} className="border-b border-gold-50/50 hover:bg-gold-50/10 transition-colors">
-                      <td className="py-3.5 px-4 font-semibold text-gray-700">{rsvp.guest_name}</td>
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 font-semibold text-gray-700 whitespace-nowrap">{rsvp.guest_name}</td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
                         {rsvp.attendance ? (
                           <span className="px-2.5 py-1 text-[10px] font-bold bg-green-50 text-green-600 rounded-full border border-green-200 uppercase">Hadir</span>
                         ) : (
                           <span className="px-2.5 py-1 text-[10px] font-bold bg-red-50 text-red-500 rounded-full border border-red-200 uppercase">Absen</span>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-gray-600">{rsvp.guest_count}</td>
-                      <td className="py-3.5 px-4 text-xs text-gray-500 max-w-xs truncate" title={rsvp.message}>{rsvp.message || '-'}</td>
-                      <td className="py-3.5 px-4 text-xs text-gray-400">
+                      <td className="py-3.5 px-4 font-mono text-gray-600 whitespace-nowrap">{rsvp.guest_count}</td>
+                      <td className="py-3.5 px-4 text-xs text-gray-500 max-w-xs truncate whitespace-nowrap" title={rsvp.message}>{rsvp.message || '-'}</td>
+                      <td className="py-3.5 px-4 text-xs text-gray-400 whitespace-nowrap">
                         {rsvp.created_at ? new Date(rsvp.created_at).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
                       </td>
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
                         <button
                           onClick={() => handleDeleteRSVPItem(rsvp.id || '')}
                           className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer"
@@ -1731,7 +1740,7 @@ export default function AdminDashboard() {
 
         {/* 7. UPGRADED GUESTBOOK - APPROVE & HIDE WISHES */}
         {activeTab === 'wishes' && (
-          <div className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-gold-100 shadow-sm">
+          <div className="flex flex-col gap-6 bg-white p-4 sm:p-8 rounded-2xl border border-gold-100 shadow-sm">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gold-50 pb-4">
               <div>
                 <h2 className="text-2xl font-serif font-bold text-gold-800">Daftar Ucapan & Moderasi</h2>
@@ -1781,9 +1790,9 @@ export default function AdminDashboard() {
 
             <div className="flex flex-col gap-4 mt-2 max-h-[500px] overflow-y-auto pr-2">
               {filteredWishes.map((wish, idx) => (
-                <div key={wish.id || idx} className="p-4 rounded-xl border border-gold-50 bg-gold-50/5 flex justify-between items-start gap-4 shadow-2xs">
+                <div key={wish.id || idx} className="p-4 rounded-xl border border-gold-50 bg-gold-50/5 flex flex-col sm:flex-row justify-between items-stretch sm:items-start gap-3 shadow-2xs">
                   <div className="flex-grow">
-                    <div className="flex gap-2 items-center mb-1">
+                    <div className="flex flex-wrap gap-2 items-center mb-1">
                       <span className="font-bold text-gold-700 text-sm">{wish.guest_name}</span>
                       <span className="text-[10px] text-gray-400">
                         {wish.created_at ? new Date(wish.created_at).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
@@ -1797,7 +1806,7 @@ export default function AdminDashboard() {
                     <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{wish.message}</p>
                   </div>
 
-                  <div className="flex gap-1 shrink-0">
+                  <div className="flex gap-2 justify-end mt-2 sm:mt-0 shrink-0 self-end sm:self-start">
                     <button
                       onClick={() => handleToggleApproval(wish.id || '', wish.is_approved)}
                       className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${wish.is_approved
@@ -1827,23 +1836,23 @@ export default function AdminDashboard() {
 
         {/* 8. GUEST REGISTRY & EXCEL CSV UPLOAD */}
         {activeTab === 'guests' && (
-          <div className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-gold-100 shadow-sm overflow-hidden">
+          <div className="flex flex-col gap-6 bg-white p-4 sm:p-8 rounded-2xl border border-gold-100 shadow-sm overflow-hidden">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gold-50 pb-4">
               <div>
                 <h2 className="text-2xl font-serif font-bold text-gold-800">Daftar Link Undangan (Guests)</h2>
                 <p className="text-xs text-gray-400 mt-1">Daftarkan nama tamu untuk link personal. Anda dapat mengimpor/ekspor data menggunakan file CSV.</p>
               </div>
 
-              <div className="flex gap-2 shrink-0">
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto shrink-0">
                 {/* Import CSV input */}
-                <label className="px-4 py-2 border border-gold-300 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                <label className="flex-grow sm:flex-grow-0 px-4 py-2 border border-gold-300 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
                   <Upload className="w-4 h-4" /> Import CSV
                   <input type="file" accept=".csv" className="hidden" onChange={handleImportGuestsCSV} />
                 </label>
 
                 <button
                   onClick={handleExportGuestsToCSV}
-                  className="px-4 py-2 border border-gold-300 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                  className="flex-grow sm:flex-grow-0 px-4 py-2 border border-gold-300 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <FileSpreadsheet className="w-4 h-4" /> Export CSV
                 </button>
@@ -1883,15 +1892,15 @@ export default function AdminDashboard() {
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
                   <tr className="border-b border-gold-100 text-gold-800 font-bold uppercase tracking-wider text-xs bg-gold-50/20">
-                    <th className="py-3 px-4">Nama Tamu</th>
-                    <th className="py-3 px-4">Invitation Slug</th>
-                    <th className="py-3 px-4 text-right">Aksi</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Nama Tamu</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Invitation Slug</th>
+                    <th className="py-3 px-4 text-right whitespace-nowrap">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredGuests.map((guest, idx) => (
                     <tr key={guest.id || idx} className="border-b border-gold-50/50 hover:bg-gold-50/10 transition-colors">
-                      <td className="py-3 px-4 font-semibold text-gray-700">
+                      <td className="py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">
                         {editingGuestId === guest.id ? (
                           <input
                             type="text"
@@ -1903,8 +1912,8 @@ export default function AdminDashboard() {
                           guest.guest_name
                         )}
                       </td>
-                      <td className="py-3 px-4 font-mono text-xs text-gold-600">/invite/{guest.slug}</td>
-                      <td className="py-3 px-4 text-right flex gap-1 justify-end items-center">
+                      <td className="py-3 px-4 font-mono text-xs text-gold-600 whitespace-nowrap">/invite/{guest.slug}</td>
+                      <td className="py-3 px-4 text-right flex gap-1 justify-end items-center whitespace-nowrap">
                         {editingGuestId === guest.id ? (
                           <button
                             onClick={() => handleUpdateGuest(guest.id || '')}
@@ -2015,7 +2024,7 @@ export default function AdminDashboard() {
 
         {/* 10. SYSTEM CONFIGURATION & WEB SETTINGS TOGGLES */}
         {activeTab === 'settings' && (
-          <form onSubmit={handleSaveInfo} className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-gold-100 shadow-sm">
+          <form onSubmit={handleSaveInfo} className="flex flex-col gap-6 bg-white p-4 sm:p-8 rounded-2xl border border-gold-100 shadow-sm">
             <div>
               <h2 className="text-2xl font-serif font-bold text-gold-800">Website Configuration Settings</h2>
               <p className="text-xs text-gray-400 mt-1">Sesuaikan meta SEO, favicon, maintenance mode, audio link, dan toggles fitur utama.</p>
@@ -2026,7 +2035,7 @@ export default function AdminDashboard() {
               <div className="sm:col-span-2 p-5 rounded-xl border border-gold-50 bg-gold-50/5 flex flex-col gap-4">
                 <span className="text-xs font-bold text-gold-700 uppercase tracking-wider mb-2">Feature Control Toggles</span>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <label className="flex items-center gap-2 text-sm text-gray-700">
                     <input
                       type="checkbox"
@@ -2142,7 +2151,7 @@ export default function AdminDashboard() {
               </div>
 
               {/* Upload settings: favicon, hero image, background image */}
-              <div className="p-4 border border-dashed border-gold-200 rounded-xl flex items-center justify-between bg-gold-50/5">
+              <div className="p-4 border border-dashed border-gold-200 rounded-xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-gold-50/5">
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold text-gold-700 uppercase tracking-wider">Website Favicon</span>
                   <label className="px-3 py-1.5 bg-white border border-gold-300 rounded hover:bg-gold-50 text-[10px] font-bold text-gold-600 tracking-wider uppercase cursor-pointer flex items-center gap-1 w-fit">
@@ -2164,7 +2173,7 @@ export default function AdminDashboard() {
                 )}
               </div>
 
-              <div className="p-4 border border-dashed border-gold-200 rounded-xl flex items-center justify-between bg-gold-50/5">
+              <div className="p-4 border border-dashed border-gold-200 rounded-xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-gold-50/5">
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold text-gold-700 uppercase tracking-wider">Cover Hero / OG Image</span>
                   <label className="px-3 py-1.5 bg-white border border-gold-300 rounded hover:bg-gold-50 text-[10px] font-bold text-gold-600 tracking-wider uppercase cursor-pointer flex items-center gap-1 w-fit">
@@ -2186,7 +2195,7 @@ export default function AdminDashboard() {
                 )}
               </div>
 
-              <div className="sm:col-span-2 p-4 border border-dashed border-gold-200 rounded-xl flex items-center justify-between bg-gold-50/5">
+              <div className="sm:col-span-2 p-4 border border-dashed border-gold-200 rounded-xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-gold-50/5">
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold text-gold-700 uppercase tracking-wider">Website Custom Background Image (Optional)</span>
                   <label className="px-3 py-1.5 bg-white border border-gold-300 rounded hover:bg-gold-50 text-[10px] font-bold text-gold-600 tracking-wider uppercase cursor-pointer flex items-center gap-1 w-fit">
@@ -2222,7 +2231,7 @@ export default function AdminDashboard() {
 
         {/* 11. MUSIC UPLOAD SECTION */}
         {activeTab === 'music' && (
-          <div className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-gold-100 shadow-sm">
+          <div className="flex flex-col gap-6 bg-white p-4 sm:p-8 rounded-2xl border border-gold-100 shadow-sm">
             <div>
               <h2 className="text-2xl font-serif font-bold text-gold-800">Background Music Manager</h2>
               <p className="text-xs text-gray-400 mt-1">Upload background music (MP3) for the digital invitation. Supported format: MP3 (Max 20MB).</p>
@@ -2301,55 +2310,64 @@ export default function AdminDashboard() {
                   <X className="w-5 h-5" />
                 </button>
 
-                <h3 className="font-serif font-bold text-gray-800 text-lg text-center mb-4">Peta / Preview QR Code</h3>
-                <Image src={qrCodeModalUrl} alt="" width={240} height={240} className="object-contain border border-gold-100 p-2 rounded-xl mb-4" />
-
-                <p className="text-xs text-gray-400 text-center leading-relaxed">
-                  Tamu dapat melakukan scan pada QR code ini untuk membuka link undangan digital personal mereka secara instan.
-                </p>
-
-                <button
-                  onClick={() => {
-                    const printWindow = window.open('', '_blank');
-                    if (printWindow) {
-                      const guestSlug = qrCodeModalUrl.split('data=')[1];
-                      const guestObj = weddingData?.guests?.find(g => encodeURIComponent(guestSlug).includes(encodeURIComponent(g.slug)));
-                      const guestNameStr = guestObj ? guestObj.guest_name : '';
-                      printWindow.document.write(`
-                        <html>
-                          <head>
-                            <title>QR Code - ${guestNameStr}</title>
-                            <style>
-                              body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: system-ui, sans-serif; text-align: center; margin: 0; }
-                              .container { border: 2px solid #C5A059; padding: 30px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-                              img { width: 250px; height: 250px; margin-top: 15px; }
-                              h2 { color: #8C6A24; margin: 0 0 10px 0; }
-                              p { color: #666; margin: 0; font-size: 14px; }
-                            </style>
-                          </head>
-                          <body>
-                            <div class="container">
-                              <h2>Undangan Pernikahan</h2>
-                              <p>Kepada Yth. Bapak/Ibu/Saudara/i:</p>
-                              <h3 style="margin: 5px 0 15px 0;">${guestNameStr}</h3>
-                              <img src="${qrCodeModalUrl}" />
-                            </div>
-                            <script>
-                              window.onload = function() {
-                                window.print();
-                                window.close();
-                              }
-                            </script>
-                          </body>
-                        </html>
-                      `);
-                      printWindow.document.close();
-                    }
-                  }}
-                  className="w-full mt-4 py-2.5 bg-gold-500 hover:bg-gold-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider text-center cursor-pointer shadow-sm"
-                >
-                  Print QR Code
-                </button>
+                {qrCodeModalUrl.includes('qr-code') || qrCodeModalUrl.includes('qrserver') ? (
+                  <div className="flex flex-col items-center w-full">
+                    <h3 className="font-serif font-bold text-gray-800 text-lg text-center mb-4">Peta / Preview QR Code</h3>
+                    <Image src={qrCodeModalUrl} alt="QR Code" width={240} height={240} className="object-contain border border-gold-100 p-2 rounded-xl mb-4" />
+                    <p className="text-xs text-gray-400 text-center leading-relaxed">
+                      Tamu dapat melakukan scan pada QR code ini untuk membuka link undangan digital personal mereka secara instan.
+                    </p>
+                    <button
+                      onClick={() => {
+                        const printWindow = window.open('', '_blank');
+                        if (printWindow) {
+                          const guestSlug = qrCodeModalUrl.split('data=')[1];
+                          const guestObj = weddingData?.guests?.find(g => encodeURIComponent(guestSlug).includes(encodeURIComponent(g.slug)));
+                          const guestNameStr = guestObj ? guestObj.guest_name : '';
+                          printWindow.document.write(`
+                            <html>
+                              <head>
+                                <title>QR Code - ${guestNameStr}</title>
+                                <style>
+                                  body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: system-ui, sans-serif; text-align: center; margin: 0; }
+                                  .container { border: 2px solid #C5A059; padding: 30px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+                                  img { width: 250px; height: 250px; margin-top: 15px; }
+                                  h2 { color: #8C6A24; margin: 0 0 10px 0; }
+                                  p { color: #666; margin: 0; font-size: 14px; }
+                                </style>
+                              </head>
+                              <body>
+                                <div class="container">
+                                  <h2>Undangan Pernikahan</h2>
+                                  <p>Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+                                  <h3 style="margin: 5px 0 15px 0;">${guestNameStr}</h3>
+                                  <img src="${qrCodeModalUrl}" />
+                                </div>
+                                <script>
+                                  window.onload = function() {
+                                    window.print();
+                                    window.close();
+                                  }
+                                </script>
+                              </body>
+                            </html>
+                          `);
+                          printWindow.document.close();
+                        }
+                      }}
+                      className="w-full mt-4 py-2.5 bg-gold-500 hover:bg-gold-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider text-center cursor-pointer shadow-sm"
+                    >
+                      Print QR Code
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center w-full">
+                    <h3 className="font-serif font-bold text-gray-800 text-lg text-center mb-4 font-sans">Preview Foto Galeri</h3>
+                    <div className="relative w-full aspect-square max-h-[60vh] border border-gold-100 rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center p-1">
+                      <Image src={qrCodeModalUrl} alt="Zoomed Photo" fill className="object-contain" />
+                    </div>
+                  </div>
+                )}
               </motion.div>
             </motion.div>
           )}
