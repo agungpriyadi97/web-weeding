@@ -3,20 +3,20 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Lock, 
-  Settings, 
-  Users, 
-  Image as ImageIcon, 
-  BookOpen, 
-  Heart, 
-  Calendar, 
-  CreditCard, 
-  LogOut, 
-  Plus, 
-  Trash2, 
-  Copy, 
-  Check, 
+import {
+  Lock,
+  Settings,
+  Users,
+  Image as ImageIcon,
+  BookOpen,
+  Heart,
+  Calendar,
+  CreditCard,
+  LogOut,
+  Plus,
+  Trash2,
+  Copy,
+  Check,
   Layers,
   Save,
   UserCheck,
@@ -51,7 +51,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'info' | 'parents' | 'gallery' | 'gifts' | 'rsvps' | 'wishes' | 'guests' | 'theme' | 'settings' | 'music' | 'love_story' | 'events' | 'whatsapp'>('dashboard');
   const [loading, setLoading] = useState(true);
   const [weddingData, setWeddingData] = useState<WeddingData | null>(null);
-  
+
   // Lists
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
   const [wishes, setWishes] = useState<Guestbook[]>([]);
@@ -73,14 +73,14 @@ export default function AdminDashboard() {
   const [infoForm, setInfoForm] = useState<Partial<EventDetail>>({});
   const [parentsList, setParentsList] = useState<ParentDetail[]>([]);
   const [giftsList, setGiftsList] = useState<GiftAccount[]>([]);
-  
+
   // New item inputs
   const [newGuestName, setNewGuestName] = useState('');
 
   // Guest inline editing states
   const [editingGuestId, setEditingGuestId] = useState<string | null>(null);
   const [editingGuestName, setEditingGuestName] = useState('');
-  
+
   // Custom theme editor state
   const [selectedTheme, setSelectedTheme] = useState('elegant-gold');
 
@@ -91,11 +91,11 @@ export default function AdminDashboard() {
   const loadData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch Wedding Details
       const dataRes = await fetch('/api/wedding-data');
       const dataJson = await dataRes.json();
-      
+
       if (dataJson.error) {
         console.error('API Error in wedding-data:', dataJson.error);
         setWeddingData({
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
           themeSettings: dataJson.themeSettings,
         };
         setWeddingData(mappedData);
-        
+
         if (dataJson.info) {
           const infoWithDefaults = {
             enable_music: true,
@@ -152,16 +152,16 @@ export default function AdminDashboard() {
           setInfoForm(infoWithDefaults);
           setSelectedTheme(dataJson.info.theme || 'elegant-gold');
         }
-        
+
         if (Array.isArray(dataJson.parents)) {
           setParentsList(dataJson.parents);
         }
-        
+
         if (Array.isArray(dataJson.giftAccounts)) {
           setGiftsList(dataJson.giftAccounts);
         }
       }
-      
+
       // Fetch RSVPs
       const rsvpRes = await fetch('/api/rsvp');
       const rsvpsJson = await rsvpRes.json();
@@ -256,7 +256,7 @@ export default function AdminDashboard() {
     if (field) {
       formData.append('field', field);
     }
-    
+
     const res = await fetch('/api/upload', {
       method: 'POST',
       body: formData,
@@ -321,7 +321,7 @@ export default function AdminDashboard() {
   const handleAddGalleryPhotos = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0 || !weddingData) return;
-    
+
     setSaveStatus('saving');
     try {
       const urls: string[] = [];
@@ -455,7 +455,7 @@ export default function AdminDashboard() {
     setSaveStatus('saving');
     try {
       const url = await uploadFile(file, 'music');
-      
+
       const updatedInfo = { ...infoForm, music_url: url };
       setInfoForm(updatedInfo);
 
@@ -539,7 +539,7 @@ export default function AdminDashboard() {
 
     const targetIdx = direction === 'up' ? index - 1 : index + 1;
     const updated = [...giftsList];
-    
+
     // Swap items
     const temp = updated[index];
     updated[index] = updated[targetIdx];
@@ -744,13 +744,13 @@ export default function AdminDashboard() {
 
       const groomNick = weddingData?.event?.groom_nickname || 'Hery';
       const brideNick = weddingData?.event?.bride_nickname || 'Bella';
-      
-      const activeTemplate = weddingData?.whatsappTemplates?.find(t => t.id === weddingData?.themeSettings?.active_whatsapp_template_id) || 
-                             weddingData?.whatsappTemplates?.find(t => t.is_default) ||
-                             weddingData?.whatsappTemplates?.[0];
-      
-      let templateText = activeTemplate?.template_text || `Kepada Yth.\nBapak/Ibu/Saudara/i\n*{{GUEST_NAME}}*\n\n*Assalamualaikum Warahmatullahi Wabarakatuh*\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{{GROOM_NAME}} & {{BRIDE_NAME}}*\n\nDetail undangan dapat diakses melalui tautan berikut:\n{{INVITATION_URL}}\n\nMerupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir dan memberikan doa restu.\n\n*Wassalamualaikum Warahmatullahi Wabarakatuh*\n\nTerima kasih.`;
-      
+
+      const activeTemplate = weddingData?.whatsappTemplates?.find(t => t.id === weddingData?.themeSettings?.active_whatsapp_template_id) ||
+        weddingData?.whatsappTemplates?.find(t => t.is_default) ||
+        weddingData?.whatsappTemplates?.[0];
+
+      let templateText = activeTemplate?.template_text || `Assalamu'alaykum Warahmatullahi Wabarakatuh\n\nDengan memohon Rahmat dan Ridho Allah Subhanahu Wa Ta’ala, kami bermaksud menyelenggarakan syukuran walimatul ‘ursy pernikahan putra putri kami:\n\n*{{GROOM_NAME}} & {{BRIDE_NAME}}*\n\nYang Insya Allah akan dilaksanakan pada:\nHari : {{WEDDING_DAY}}\nTanggal : {{WEDDING_DATE}}\nWaktu : {{WEDDING_TIME}}\nTempat : {{WEDDING_VENUE}}\n\nSebuah kehormatan besar bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu kepada kedua mempelai.\n\nInformasi lebih lengkap dapat diakses melalui tautan berikut:\n{{INVITATION_URL}}\n\nAtas kehadiran dan doa restu Bapak/Ibu/Saudara/i, kami mengucapkan Jazakumullahu Khairan Katsiran.`;
+
       templateText = templateText
         .replace(/\{\{GUEST_NAME\}\}/g, guest.guest_name)
         .replace(/\{\{GROOM_NAME\}\}/g, groomNick)
@@ -850,7 +850,7 @@ export default function AdminDashboard() {
 
     const sortedDates = Object.keys(dateCounts).sort().slice(-7);
     const maxVal = Math.max(...sortedDates.map(d => dateCounts[d]), 5);
-    
+
     return (
       <div className="bg-white p-6 rounded-xl border border-gold-100 shadow-xs">
         <h3 className="font-serif font-bold text-gray-800 text-sm mb-4">Grafik Kunjungan (7 Hari Terakhir)</h3>
@@ -898,7 +898,7 @@ export default function AdminDashboard() {
     return matchSearch && !w.is_approved;
   });
 
-  const filteredGuests = (weddingData?.guests || []).filter(g => 
+  const filteredGuests = (weddingData?.guests || []).filter(g =>
     g.guest_name.toLowerCase().includes(guestSearch.toLowerCase())
   );
 
@@ -910,7 +910,7 @@ export default function AdminDashboard() {
           <div className="w-16 h-16 bg-gold-50 border border-gold-300 rounded-full flex items-center justify-center text-gold-600 mb-6">
             <Lock className="w-8 h-8" />
           </div>
-          
+
           <h1 className="text-2xl font-serif font-bold text-gold-800 text-center">Wedding Admin Control</h1>
           <p className="text-xs text-gray-400 mt-2 text-center">Gunakan credentials admin untuk masuk</p>
 
@@ -993,11 +993,10 @@ export default function AdminDashboard() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                    activeTab === tab.id
-                      ? 'bg-gold-50 text-gold-700 font-semibold border-l-4 border-gold-500'
-                      : 'text-gray-500 hover:bg-gold-50/20 hover:text-gold-600'
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${activeTab === tab.id
+                    ? 'bg-gold-50 text-gold-700 font-semibold border-l-4 border-gold-500'
+                    : 'text-gray-500 hover:bg-gold-50/20 hover:text-gold-600'
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   {tab.label}
@@ -1417,7 +1416,7 @@ export default function AdminDashboard() {
                 <div key={item.id || idx} className="aspect-square relative rounded-xl overflow-hidden border border-gold-100 group shadow-xs">
                   <Image src={item.image_url} alt="" fill className="object-cover" />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button 
+                    <button
                       onClick={() => handleSortGalleryItem(idx, 'left')}
                       disabled={idx === 0}
                       className="p-1.5 bg-white text-gold-600 rounded-full hover:bg-gold-50 transition-colors shadow-lg cursor-pointer disabled:opacity-30"
@@ -1425,14 +1424,14 @@ export default function AdminDashboard() {
                     >
                       ◀
                     </button>
-                    <button 
+                    <button
                       onClick={() => setQrCodeModalUrl(item.image_url)} // View zoom lightbox preview
                       className="p-1.5 bg-white text-gold-600 rounded-full hover:bg-gold-50 transition-colors shadow-lg cursor-pointer"
                       title="Lihat"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleSortGalleryItem(idx, 'right')}
                       disabled={idx === (weddingData?.gallery.length || 0) - 1}
                       className="p-1.5 bg-white text-gold-600 rounded-full hover:bg-gold-50 transition-colors shadow-lg cursor-pointer disabled:opacity-30"
@@ -1440,7 +1439,7 @@ export default function AdminDashboard() {
                     >
                       ▶
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDeleteGalleryItem(item.image_url)}
                       className="p-1.5 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
                       title="Hapus"
@@ -1557,11 +1556,11 @@ export default function AdminDashboard() {
                     )}
                     <label className="px-3 py-1 bg-gold-50 border border-gold-300 rounded hover:bg-gold-100 text-[10px] font-bold text-gold-600 tracking-wider uppercase cursor-pointer flex items-center gap-1">
                       <Upload className="w-3 h-3" /> Upload QRIS
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        className="hidden" 
-                        onChange={(e) => handleImageUpload(e, 'qris', `gift_accounts:${idx}:qris_image`, (url) => handleUpdateGiftField(idx, 'qris_image', url))} 
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleImageUpload(e, 'qris', `gift_accounts:${idx}:qris_image`, (url) => handleUpdateGiftField(idx, 'qris_image', url))}
                       />
                     </label>
                   </div>
@@ -1592,7 +1591,7 @@ export default function AdminDashboard() {
                 <h2 className="text-2xl font-serif font-bold text-gold-800">RSVP Manager</h2>
                 <p className="text-xs text-gray-400 mt-1">Audit konfirmasi kehadiran tamu. Saring, cetak, dan ekspor data.</p>
               </div>
-              
+
               <div className="flex gap-2 shrink-0">
                 <button
                   onClick={handleExportRsvpsToCSV}
@@ -1699,7 +1698,7 @@ export default function AdminDashboard() {
                 <h2 className="text-2xl font-serif font-bold text-gold-800">Daftar Ucapan & Moderasi</h2>
                 <p className="text-xs text-gray-400 mt-1">Audit doa restu dari para tamu. Anda dapat menyembunyikan/menampilkan pesan di landing page.</p>
               </div>
-              
+
               <button
                 onClick={handleExportWishesToCSV}
                 className="px-4 py-2 border border-gold-300 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0"
@@ -1758,15 +1757,14 @@ export default function AdminDashboard() {
                     </div>
                     <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{wish.message}</p>
                   </div>
-                  
+
                   <div className="flex gap-1 shrink-0">
                     <button
                       onClick={() => handleToggleApproval(wish.id || '', wish.is_approved)}
-                      className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                        wish.is_approved 
-                          ? 'border-slate-300 hover:bg-slate-50 text-slate-500' 
-                          : 'border-green-300 hover:bg-green-50 text-green-600'
-                      }`}
+                      className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${wish.is_approved
+                        ? 'border-slate-300 hover:bg-slate-50 text-slate-500'
+                        : 'border-green-300 hover:bg-green-50 text-green-600'
+                        }`}
                       title={wish.is_approved ? 'Sembunyikan Pesan' : 'Tampilkan Pesan'}
                     >
                       {wish.is_approved ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -1796,14 +1794,14 @@ export default function AdminDashboard() {
                 <h2 className="text-2xl font-serif font-bold text-gold-800">Daftar Link Undangan (Guests)</h2>
                 <p className="text-xs text-gray-400 mt-1">Daftarkan nama tamu untuk link personal. Anda dapat mengimpor/ekspor data menggunakan file CSV.</p>
               </div>
-              
+
               <div className="flex gap-2 shrink-0">
                 {/* Import CSV input */}
                 <label className="px-4 py-2 border border-gold-300 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
                   <Upload className="w-4 h-4" /> Import CSV
                   <input type="file" accept=".csv" className="hidden" onChange={handleImportGuestsCSV} />
                 </label>
-                
+
                 <button
                   onClick={handleExportGuestsToCSV}
                   className="px-4 py-2 border border-gold-300 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
@@ -1886,7 +1884,7 @@ export default function AdminDashboard() {
                             Edit
                           </button>
                         )}
-                         <button
+                        <button
                           onClick={() => {
                             if (typeof window !== 'undefined') {
                               const inviteUrl = `${window.location.protocol}//${window.location.host}/invite/${guest.slug}`;
@@ -1988,7 +1986,7 @@ export default function AdminDashboard() {
               {/* Feature toggles */}
               <div className="sm:col-span-2 p-5 rounded-xl border border-gold-50 bg-gold-50/5 flex flex-col gap-4">
                 <span className="text-xs font-bold text-gold-700 uppercase tracking-wider mb-2">Feature Control Toggles</span>
-                
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   <label className="flex items-center gap-2 text-sm text-gray-700">
                     <input
@@ -2200,18 +2198,18 @@ export default function AdminDashboard() {
                   <span className="text-xs font-semibold text-gray-700 text-center truncate max-w-xs" title={infoForm.music_url}>
                     {infoForm.music_url.split('/').pop()}
                   </span>
-                  
+
                   {/* Audio player preview */}
                   <audio src={infoForm.music_url} controls className="w-full mt-2" />
 
                   <div className="flex gap-3 w-full mt-4">
                     <label className="flex-1 py-2 border border-gold-400 hover:bg-gold-50/50 text-gold-600 rounded-lg text-xs font-semibold text-center cursor-pointer flex items-center justify-center gap-1">
                       <Upload className="w-3.5 h-3.5" /> Replace Music
-                      <input 
-                        type="file" 
-                        accept="audio/mp3,audio/mpeg" 
-                        className="hidden" 
-                        onChange={handleMusicUpload} 
+                      <input
+                        type="file"
+                        accept="audio/mp3,audio/mpeg"
+                        className="hidden"
+                        onChange={handleMusicUpload}
                       />
                     </label>
                     <button
@@ -2263,10 +2261,10 @@ export default function AdminDashboard() {
                 >
                   <X className="w-5 h-5" />
                 </button>
-                
+
                 <h3 className="font-serif font-bold text-gray-800 text-lg text-center mb-4">Peta / Preview QR Code</h3>
                 <Image src={qrCodeModalUrl} alt="" width={240} height={240} className="object-contain border border-gold-100 p-2 rounded-xl mb-4" />
-                
+
                 <p className="text-xs text-gray-400 text-center leading-relaxed">
                   Tamu dapat melakukan scan pada QR code ini untuk membuka link undangan digital personal mereka secara instan.
                 </p>
