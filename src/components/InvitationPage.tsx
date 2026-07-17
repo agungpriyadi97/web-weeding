@@ -306,6 +306,26 @@ export default function InvitationPage({ initialData, guestName }: InvitationPag
 
   return (
     <div className={`relative overflow-x-hidden min-h-screen ${styles.bodyBg} ${styles.fontFamily}`}>
+      <style>{`
+        :root {
+          --color-gold-50: ${initialData.event.primary_color ? `${initialData.event.primary_color}10` : '#fbf8f0'};
+          --color-gold-100: ${initialData.event.primary_color ? `${initialData.event.primary_color}25` : '#f5eed9'};
+          --color-gold-200: ${initialData.event.primary_color ? `${initialData.event.primary_color}50` : '#eadcb4'};
+          --color-gold-300: ${initialData.event.primary_color ? `${initialData.event.primary_color}80` : '#dcc284'};
+          --color-gold-400: ${initialData.event.primary_color || '#cca559'};
+          --color-gold-500: ${initialData.event.primary_color || '#c0903f'};
+          --color-gold-600: ${initialData.event.primary_color || '#a77531'};
+          --color-gold-700: ${initialData.event.primary_color || '#885b27'};
+          --color-gold-800: ${initialData.event.primary_color || '#6f4922'};
+          --color-gold-900: ${initialData.event.primary_color || '#5b3c1e'};
+          --color-cream-50: ${initialData.event.secondary_color || '#fdfcf9'};
+          --color-cream-100: ${initialData.event.secondary_color || '#fbf7f0'};
+          --color-cream-200: ${initialData.event.secondary_color || '#f4ecdc'};
+          --color-cream-300: ${initialData.event.secondary_color || '#ebdcc3'};
+          --color-cream-400: ${initialData.event.secondary_color || '#ddc29f'};
+          --color-cream-500: ${initialData.event.secondary_color || '#cda47b'};
+        }
+      `}</style>
       {/* Dynamic Background Custom Image if uploaded */}
       {initialData.event.background_image && (
         <div 

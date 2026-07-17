@@ -28,7 +28,8 @@ import {
   X,
   Music
 } from 'lucide-react';
-import { WeddingData, RSVP, Guestbook, Guest, EventDetail, ParentDetail, GiftAccount, AnalyticsLog } from '@/types/wedding';
+import { WeddingData, RSVP, Guestbook, Guest, EventDetail, ParentDetail, GiftAccount, AnalyticsLog, MempelaiDetail } from '@/types/wedding';
+import { supabase } from '@/utils/supabaseClient';
 
 export default function AdminDashboard() {
   // Auth state
@@ -66,6 +67,10 @@ export default function AdminDashboard() {
   
   // New item inputs
   const [newGuestName, setNewGuestName] = useState('');
+
+  // Guest inline editing states
+  const [editingGuestId, setEditingGuestId] = useState<string | null>(null);
+  const [editingGuestName, setEditingGuestName] = useState('');
   
   // Custom theme editor state
   const [selectedTheme, setSelectedTheme] = useState('elegant-gold');
@@ -81,45 +86,72 @@ export default function AdminDashboard() {
       // Fetch Wedding Details
       const dataRes = await fetch('/api/wedding-data');
       const dataJson = await dataRes.json();
-      setWeddingData(dataJson);
       
-      if (dataJson.info) {
-        const infoWithDefaults = {
-          enable_music: true,
-          enable_countdown: true,
-          enable_guestbook: true,
-          enable_rsvp: true,
-          enable_gift: true,
-          maintenance_mode: false,
-          ...dataJson.info
-        };
-        setInfoForm(infoWithDefaults);
-        setSelectedTheme(dataJson.info.theme || 'elegant-gold');
+      if (dataJson.error) {
+        console.error('API Error in wedding-data:', dataJson.error);
+        setWeddingData({
+          groom: {} as MempelaiDetail,
+          bride: {} as MempelaiDetail,
+          event: {} as EventDetail,
+          parents: [],
+          gallery: [],
+          giftAccounts: [],
+          guests: [],
+          closingMessage: ''
+        });
+      } else {
+        setWeddingData(dataJson);
+        
+        if (dataJson.info) {
+          const infoWithDefaults = {
+            enable_music: true,
+            enable_countdown: true,
+            enable_guestbook: true,
+            enable_rsvp: true,
+            enable_gift: true,
+            maintenance_mode: false,
+            ...dataJson.info
+          };
+          setInfoForm(infoWithDefaults);
+          setSelectedTheme(dataJson.info.theme || 'elegant-gold');
+        }
+        
+        if (Array.isArray(dataJson.parents)) {
+          setParentsList(dataJson.parents);
+        }
+        
+        if (Array.isArray(dataJson.giftAccounts)) {
+          setGiftsList(dataJson.giftAccounts);
+        }
       }
       
-      if (dataJson.parents) {
-        setParentsList(dataJson.parents);
-      }
-
-      if (dataJson.giftAccounts) {
-        setGiftsList(dataJson.giftAccounts);
-      }
-
       // Fetch RSVPs
       const rsvpRes = await fetch('/api/rsvp');
       const rsvpsJson = await rsvpRes.json();
-      setRsvps(rsvpsJson);
+      if (Array.isArray(rsvpsJson)) {
+        setRsvps(rsvpsJson);
+      } else {
+        console.error('RSVP API Error:', rsvpsJson?.error || 'Invalid response');
+        setRsvps([]);
+      }
 
       // Fetch Wishes (All, including unapproved for administration)
       const wishRes = await fetch('/api/guestbook?all=true');
       const wishesJson = await wishRes.json();
-      setWishes(wishesJson);
+      if (Array.isArray(wishesJson)) {
+        setWishes(wishesJson);
+      } else {
+        console.error('Guestbook API Error:', wishesJson?.error || 'Invalid response');
+        setWishes([]);
+      }
 
       // Fetch Analytics logs
       const analyticsRes = await fetch('/api/analytics');
       const analyticsJson = await analyticsRes.json();
       if (Array.isArray(analyticsJson)) {
         setAnalyticsLogs(analyticsJson);
+      } else {
+        setAnalyticsLogs([]);
       }
 
     } catch (err) {
@@ -130,9 +162,36 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
-      loadData();
-    }
+    if (!isLoggedIn) return;
+
+    loadData();
+
+    const rsvpChannel = supabase
+      .channel('realtime-rsvp-admin')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rsvp' }, () => {
+        loadData();
+      })
+      .subscribe();
+
+    const guestbookChannel = supabase
+      .channel('realtime-guestbook-admin')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'guestbook' }, () => {
+        loadData();
+      })
+      .subscribe();
+
+    const infoChannel = supabase
+      .channel('realtime-wedding-info-admin')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'wedding_info' }, () => {
+        loadData();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(rsvpChannel);
+      supabase.removeChannel(guestbookChannel);
+      supabase.removeChannel(infoChannel);
+    };
   }, [isLoggedIn]);
 
   // Handle local authentication bypass
@@ -153,10 +212,13 @@ export default function AdminDashboard() {
   };
 
   // Upload handler wrapper calling api
-  const uploadFile = async (file: File, bucket: string): Promise<string> => {
+  const uploadFile = async (file: File, bucket: string, field?: string): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('bucket', bucket);
+    if (field) {
+      formData.append('field', field);
+    }
     
     const res = await fetch('/api/upload', {
       method: 'POST',
@@ -168,15 +230,16 @@ export default function AdminDashboard() {
   };
 
   // Trigger file upload and set field path
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, bucket: string, callback: (url: string) => void) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, bucket: string, field: string, callback: (url: string) => void) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
       setSaveStatus('saving');
-      const url = await uploadFile(file, bucket);
+      const url = await uploadFile(file, bucket, field);
       callback(url);
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 2500);
+      loadData();
     } catch (err) {
       console.error('File upload error:', err);
       setSaveStatus('error');
@@ -295,6 +358,44 @@ export default function AdminDashboard() {
         } else {
           setSaveStatus('error');
         }
+      }
+    } catch (err) {
+      console.error(err);
+      setSaveStatus('error');
+    }
+  };
+
+  const handleSortGalleryItem = async (index: number, direction: 'left' | 'right') => {
+    if (!weddingData) return;
+    const gallery = [...weddingData.gallery];
+    if (direction === 'left' && index === 0) return;
+    if (direction === 'right' && index === gallery.length - 1) return;
+
+    const targetIdx = direction === 'left' ? index - 1 : index + 1;
+    const temp = gallery[index];
+    gallery[index] = gallery[targetIdx];
+    gallery[targetIdx] = temp;
+
+    // Reset sort_order fields
+    gallery.forEach((item, idx) => {
+      item.sort_order = idx;
+    });
+
+    setSaveStatus('saving');
+    try {
+      const res = await fetch('/api/wedding-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gallery
+        })
+      });
+      if (res.ok) {
+        setSaveStatus('success');
+        setTimeout(() => setSaveStatus('idle'), 2500);
+        loadData();
+      } else {
+        setSaveStatus('error');
       }
     } catch (err) {
       console.error(err);
@@ -478,7 +579,17 @@ export default function AdminDashboard() {
 
   const handleDeleteWish = async (id: string) => {
     if (!confirm('Hapus pesan ini dari guestbook?')) return;
-    setWishes(wishes.filter(w => w.id !== id));
+    try {
+      const res = await fetch(`/api/guestbook?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setWishes(wishes.filter(w => w.id !== id));
+      } else {
+        alert('Gagal menghapus pesan.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Terjadi kesalahan saat menghapus pesan.');
+    }
   };
 
   const handleExportWishesToCSV = () => {
@@ -527,6 +638,39 @@ export default function AdminDashboard() {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleUpdateGuest = async (id: string) => {
+    if (!editingGuestName.trim() || !weddingData) return;
+    const slug = editingGuestName
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    const updated = weddingData.guests.map(g => g.id === id ? { ...g, guest_name: editingGuestName, slug } : g);
+    setSaveStatus('saving');
+    try {
+      const res = await fetch('/api/wedding-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guests: updated
+        })
+      });
+      if (res.ok) {
+        setSaveStatus('success');
+        setEditingGuestId(null);
+        setTimeout(() => setSaveStatus('idle'), 2500);
+        loadData();
+      } else {
+        setSaveStatus('error');
+      }
+    } catch (err) {
+      console.error(err);
+      setSaveStatus('error');
     }
   };
 
@@ -825,22 +969,34 @@ export default function AdminDashboard() {
               <p className="text-xs text-gray-400 mt-1">Review ringkasan statistik kunjungan dan konfirmasi tamu.</p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
               <div className="bg-white p-5 rounded-xl border border-gold-100 shadow-xs flex flex-col justify-between">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total Kunjungan</span>
-                <span className="text-3xl font-bold font-serif text-gold-600 mt-2">{(weddingData?.event?.visitor_count || 0)}</span>
+                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Visitor</span>
+                <span className="text-2xl font-bold font-serif text-gold-600 mt-2">{(weddingData?.event?.visitor_count || 0)}</span>
               </div>
               <div className="bg-white p-5 rounded-xl border border-gold-100 shadow-xs flex flex-col justify-between">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total Tamu (Hadir)</span>
-                <span className="text-3xl font-bold font-serif text-green-600 mt-2">{totalGuestsResponse}</span>
+                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Total RSVP</span>
+                <span className="text-2xl font-bold font-serif text-slate-600 mt-2">{rsvps.length}</span>
               </div>
               <div className="bg-white p-5 rounded-xl border border-gold-100 shadow-xs flex flex-col justify-between">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">RSVP Hadir</span>
-                <span className="text-3xl font-bold font-serif text-blue-600 mt-2">{attendingCount}</span>
+                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">RSVP Hadir</span>
+                <span className="text-2xl font-bold font-serif text-green-600 mt-2">{attendingCount}</span>
               </div>
               <div className="bg-white p-5 rounded-xl border border-gold-100 shadow-xs flex flex-col justify-between">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Doa Guestbook</span>
-                <span className="text-3xl font-bold font-serif text-slate-700 mt-2">{wishes.length}</span>
+                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">RSVP Absen</span>
+                <span className="text-2xl font-bold font-serif text-red-500 mt-2">{nonAttendingCount}</span>
+              </div>
+              <div className="bg-white p-5 rounded-xl border border-gold-100 shadow-xs flex flex-col justify-between">
+                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Guestbook</span>
+                <span className="text-2xl font-bold font-serif text-blue-600 mt-2">{wishes.length}</span>
+              </div>
+              <div className="bg-white p-5 rounded-xl border border-gold-100 shadow-xs flex flex-col justify-between">
+                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Gallery</span>
+                <span className="text-2xl font-bold font-serif text-indigo-600 mt-2">{(weddingData?.gallery?.length || 0)}</span>
+              </div>
+              <div className="bg-white p-5 rounded-xl border border-gold-100 shadow-xs flex flex-col justify-between">
+                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Guests</span>
+                <span className="text-2xl font-bold font-serif text-purple-600 mt-2">{(weddingData?.guests?.length || 0)}</span>
               </div>
             </div>
 
@@ -862,13 +1018,22 @@ export default function AdminDashboard() {
               <div className="p-4 border border-dashed border-gold-200 rounded-xl flex flex-col items-center gap-4 bg-gold-50/5">
                 <span className="text-xs font-bold text-gold-700 uppercase tracking-wider">Foto Groom / Pria</span>
                 {infoForm.groom_image ? (
-                  <img src={infoForm.groom_image} className="w-20 h-20 rounded-full object-cover border border-gold-300" alt="" />
+                  <div className="relative">
+                    <img src={infoForm.groom_image} className="w-20 h-20 rounded-full object-cover border border-gold-300" alt="" />
+                    <button
+                      type="button"
+                      onClick={() => setInfoForm({ ...infoForm, groom_image: '' })}
+                      className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-1 shadow hover:bg-red-700 cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 ) : (
                   <div className="w-20 h-20 rounded-full bg-gold-50 border border-gold-200 flex items-center justify-center text-gold-600 font-serif text-xl">Pria</div>
                 )}
                 <label className="px-4 py-2 border border-gold-400 rounded-lg hover:bg-gold-50 text-gold-600 text-xs font-semibold tracking-wider uppercase cursor-pointer flex items-center gap-2">
                   <Upload className="w-3.5 h-3.5" /> Upload Foto Pria
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'wedding-info', (url) => setInfoForm({ ...infoForm, groom_image: url }))} />
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'wedding-info', 'groom_image', (url) => setInfoForm({ ...infoForm, groom_image: url }))} />
                 </label>
               </div>
 
@@ -876,13 +1041,22 @@ export default function AdminDashboard() {
               <div className="p-4 border border-dashed border-gold-200 rounded-xl flex flex-col items-center gap-4 bg-gold-50/5">
                 <span className="text-xs font-bold text-gold-700 uppercase tracking-wider">Foto Bride / Wanita</span>
                 {infoForm.bride_image ? (
-                  <img src={infoForm.bride_image} className="w-20 h-20 rounded-full object-cover border border-gold-300" alt="" />
+                  <div className="relative">
+                    <img src={infoForm.bride_image} className="w-20 h-20 rounded-full object-cover border border-gold-300" alt="" />
+                    <button
+                      type="button"
+                      onClick={() => setInfoForm({ ...infoForm, bride_image: '' })}
+                      className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-1 shadow hover:bg-red-700 cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 ) : (
                   <div className="w-20 h-20 rounded-full bg-gold-50 border border-gold-200 flex items-center justify-center text-gold-600 font-serif text-xl">Wanita</div>
                 )}
                 <label className="px-4 py-2 border border-gold-400 rounded-lg hover:bg-gold-50 text-gold-600 text-xs font-semibold tracking-wider uppercase cursor-pointer flex items-center gap-2">
                   <Upload className="w-3.5 h-3.5" /> Upload Foto Wanita
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'wedding-info', (url) => setInfoForm({ ...infoForm, bride_image: url }))} />
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'wedding-info', 'bride_image', (url) => setInfoForm({ ...infoForm, bride_image: url }))} />
                 </label>
               </div>
 
@@ -1061,7 +1235,7 @@ export default function AdminDashboard() {
                       </div>
                       <label className="px-3 py-1 bg-white border border-gold-300 rounded hover:bg-gold-50 text-[10px] font-bold text-gold-600 tracking-wider uppercase cursor-pointer flex items-center gap-1 w-fit">
                         <Upload className="w-3 h-3" /> Foto Ayah
-                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'parents', (url) => {
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'parents', `parents:${parent.type}:father_photo`, (url) => {
                           const updated = [...parentsList];
                           updated[idx] = { ...updated[idx], father_photo: url };
                           setParentsList(updated);
@@ -1070,7 +1244,20 @@ export default function AdminDashboard() {
                     </div>
 
                     {parent.father_photo ? (
-                      <img src={parent.father_photo} className="w-16 h-16 rounded-full object-cover border border-gold-200" alt="" />
+                      <div className="relative">
+                        <img src={parent.father_photo} className="w-16 h-16 rounded-full object-cover border border-gold-200" alt="" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = [...parentsList];
+                            updated[idx] = { ...updated[idx], father_photo: '' };
+                            setParentsList(updated);
+                          }}
+                          className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
                     ) : (
                       <div className="w-16 h-16 rounded-full bg-gold-50 border border-gold-200 flex items-center justify-center text-[10px] text-gold-400 uppercase font-bold">Ayah</div>
                     )}
@@ -1094,7 +1281,7 @@ export default function AdminDashboard() {
                       </div>
                       <label className="px-3 py-1 bg-white border border-gold-300 rounded hover:bg-gold-50 text-[10px] font-bold text-gold-600 tracking-wider uppercase cursor-pointer flex items-center gap-1 w-fit">
                         <Upload className="w-3 h-3" /> Foto Ibu
-                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'parents', (url) => {
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'parents', `parents:${parent.type}:mother_photo`, (url) => {
                           const updated = [...parentsList];
                           updated[idx] = { ...updated[idx], mother_photo: url };
                           setParentsList(updated);
@@ -1103,7 +1290,20 @@ export default function AdminDashboard() {
                     </div>
 
                     {parent.mother_photo ? (
-                      <img src={parent.mother_photo} className="w-16 h-16 rounded-full object-cover border border-gold-200" alt="" />
+                      <div className="relative">
+                        <img src={parent.mother_photo} className="w-16 h-16 rounded-full object-cover border border-gold-200" alt="" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = [...parentsList];
+                            updated[idx] = { ...updated[idx], mother_photo: '' };
+                            setParentsList(updated);
+                          }}
+                          className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
                     ) : (
                       <div className="w-16 h-16 rounded-full bg-gold-50 border border-gold-200 flex items-center justify-center text-[10px] text-gold-400 uppercase font-bold">Ibu</div>
                     )}
@@ -1152,14 +1352,32 @@ export default function AdminDashboard() {
                   <img src={item.image_url} className="w-full h-full object-cover" alt="" />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <button 
+                      onClick={() => handleSortGalleryItem(idx, 'left')}
+                      disabled={idx === 0}
+                      className="p-1.5 bg-white text-gold-600 rounded-full hover:bg-gold-50 transition-colors shadow-lg cursor-pointer disabled:opacity-30"
+                      title="Geser Kiri"
+                    >
+                      ◀
+                    </button>
+                    <button 
                       onClick={() => setQrCodeModalUrl(item.image_url)} // View zoom lightbox preview
-                      className="p-2 bg-white text-gold-600 rounded-full hover:bg-gold-50 transition-colors shadow-lg cursor-pointer"
+                      className="p-1.5 bg-white text-gold-600 rounded-full hover:bg-gold-50 transition-colors shadow-lg cursor-pointer"
+                      title="Lihat"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button 
+                      onClick={() => handleSortGalleryItem(idx, 'right')}
+                      disabled={idx === (weddingData?.gallery.length || 0) - 1}
+                      className="p-1.5 bg-white text-gold-600 rounded-full hover:bg-gold-50 transition-colors shadow-lg cursor-pointer disabled:opacity-30"
+                      title="Geser Kanan"
+                    >
+                      ▶
+                    </button>
+                    <button 
                       onClick={() => handleDeleteGalleryItem(item.image_url)}
-                      className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
+                      className="p-1.5 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
+                      title="Hapus"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -1277,7 +1495,7 @@ export default function AdminDashboard() {
                         type="file" 
                         accept="image/*" 
                         className="hidden" 
-                        onChange={(e) => handleImageUpload(e, 'qris', (url) => handleUpdateGiftField(idx, 'qris_image', url))} 
+                        onChange={(e) => handleImageUpload(e, 'qris', `gift_accounts:${idx}:qris_image`, (url) => handleUpdateGiftField(idx, 'qris_image', url))} 
                       />
                     </label>
                   </div>
@@ -1570,9 +1788,38 @@ export default function AdminDashboard() {
                 <tbody>
                   {filteredGuests.map((guest, idx) => (
                     <tr key={guest.id || idx} className="border-b border-gold-50/50 hover:bg-gold-50/10 transition-colors">
-                      <td className="py-3 px-4 font-semibold text-gray-700">{guest.guest_name}</td>
+                      <td className="py-3 px-4 font-semibold text-gray-700">
+                        {editingGuestId === guest.id ? (
+                          <input
+                            type="text"
+                            value={editingGuestName}
+                            onChange={(e) => setEditingGuestName(e.target.value)}
+                            className="px-2 py-1 border border-gold-200 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-gold-400"
+                          />
+                        ) : (
+                          guest.guest_name
+                        )}
+                      </td>
                       <td className="py-3 px-4 font-mono text-xs text-gold-600">/invite/{guest.slug}</td>
-                      <td className="py-3 px-4 text-right flex gap-1 justify-end">
+                      <td className="py-3 px-4 text-right flex gap-1 justify-end items-center">
+                        {editingGuestId === guest.id ? (
+                          <button
+                            onClick={() => handleUpdateGuest(guest.id || '')}
+                            className="px-2.5 py-1.5 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 cursor-pointer shadow-xs"
+                          >
+                            Save
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setEditingGuestId(guest.id || '');
+                              setEditingGuestName(guest.guest_name);
+                            }}
+                            className="px-2.5 py-1.5 border border-gold-300 rounded-lg text-xs font-semibold text-gold-600 hover:bg-gold-50 cursor-pointer"
+                          >
+                            Edit
+                          </button>
+                        )}
                         <button
                           onClick={() => {
                             if (typeof window !== 'undefined') {
@@ -1661,6 +1908,46 @@ export default function AdminDashboard() {
                   )}
                 </div>
               ))}
+            </div>
+
+            <div className="mt-8 border-t border-gold-50 pt-6">
+              <h3 className="font-serif font-bold text-gray-800 text-sm mb-4">Custom Theme Colors</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-md">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Primary Color (Aksen)</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="color"
+                      value={infoForm.primary_color || '#C5A059'}
+                      onChange={(e) => setInfoForm({ ...infoForm, primary_color: e.target.value })}
+                      className="w-10 h-10 border border-gold-100 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={infoForm.primary_color || '#C5A059'}
+                      onChange={(e) => setInfoForm({ ...infoForm, primary_color: e.target.value })}
+                      className="flex-grow px-3 py-2 border border-gold-100 rounded-lg text-sm font-mono"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Secondary Color (Background)</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="color"
+                      value={infoForm.secondary_color || '#FDFBF7'}
+                      onChange={(e) => setInfoForm({ ...infoForm, secondary_color: e.target.value })}
+                      className="w-10 h-10 border border-gold-100 rounded cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={infoForm.secondary_color || '#FDFBF7'}
+                      onChange={(e) => setInfoForm({ ...infoForm, secondary_color: e.target.value })}
+                      className="flex-grow px-3 py-2 border border-gold-100 rounded-lg text-sm font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="flex justify-end gap-3 mt-6 border-t border-gold-50 pt-6">
@@ -1808,10 +2095,21 @@ export default function AdminDashboard() {
                   <span className="text-xs font-bold text-gold-700 uppercase tracking-wider">Website Favicon</span>
                   <label className="px-3 py-1.5 bg-white border border-gold-300 rounded hover:bg-gold-50 text-[10px] font-bold text-gold-600 tracking-wider uppercase cursor-pointer flex items-center gap-1 w-fit">
                     <Upload className="w-3 h-3" /> Upload Favicon
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'wedding-info', (url) => setInfoForm({ ...infoForm, favicon: url }))} />
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'wedding-info', 'favicon', (url) => setInfoForm({ ...infoForm, favicon: url }))} />
                   </label>
                 </div>
-                {infoForm.favicon && <img src={infoForm.favicon} className="w-10 h-10 object-contain border border-gold-200 p-1 bg-white rounded" alt="" />}
+                {infoForm.favicon && (
+                  <div className="relative">
+                    <img src={infoForm.favicon} className="w-10 h-10 object-contain border border-gold-200 p-1 bg-white rounded" alt="" />
+                    <button
+                      type="button"
+                      onClick={() => setInfoForm({ ...infoForm, favicon: '' })}
+                      className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="p-4 border border-dashed border-gold-200 rounded-xl flex items-center justify-between bg-gold-50/5">
@@ -1819,10 +2117,21 @@ export default function AdminDashboard() {
                   <span className="text-xs font-bold text-gold-700 uppercase tracking-wider">Cover Hero / OG Image</span>
                   <label className="px-3 py-1.5 bg-white border border-gold-300 rounded hover:bg-gold-50 text-[10px] font-bold text-gold-600 tracking-wider uppercase cursor-pointer flex items-center gap-1 w-fit">
                     <Upload className="w-3 h-3" /> Upload Cover Photo
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'cover', (url) => setInfoForm({ ...infoForm, hero_image: url, og_image: url }))} />
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'cover', 'hero_image', (url) => setInfoForm({ ...infoForm, hero_image: url, og_image: url }))} />
                   </label>
                 </div>
-                {infoForm.hero_image && <img src={infoForm.hero_image} className="w-16 h-10 object-cover border border-gold-200 bg-white rounded" alt="" />}
+                {infoForm.hero_image && (
+                  <div className="relative">
+                    <img src={infoForm.hero_image} className="w-16 h-10 object-cover border border-gold-200 bg-white rounded" alt="" />
+                    <button
+                      type="button"
+                      onClick={() => setInfoForm({ ...infoForm, hero_image: '', og_image: '' })}
+                      className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="sm:col-span-2 p-4 border border-dashed border-gold-200 rounded-xl flex items-center justify-between bg-gold-50/5">
@@ -1830,10 +2139,21 @@ export default function AdminDashboard() {
                   <span className="text-xs font-bold text-gold-700 uppercase tracking-wider">Website Custom Background Image (Optional)</span>
                   <label className="px-3 py-1.5 bg-white border border-gold-300 rounded hover:bg-gold-50 text-[10px] font-bold text-gold-600 tracking-wider uppercase cursor-pointer flex items-center gap-1 w-fit">
                     <Upload className="w-3 h-3" /> Upload Background
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'wedding-info', (url) => setInfoForm({ ...infoForm, background_image: url }))} />
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'wedding-info', 'background_image', (url) => setInfoForm({ ...infoForm, background_image: url }))} />
                   </label>
                 </div>
-                {infoForm.background_image && <img src={infoForm.background_image} className="w-16 h-10 object-cover border border-gold-200 bg-white rounded" alt="" />}
+                {infoForm.background_image && (
+                  <div className="relative">
+                    <img src={infoForm.background_image} className="w-16 h-10 object-cover border border-gold-200 bg-white rounded" alt="" />
+                    <button
+                      type="button"
+                      onClick={() => setInfoForm({ ...infoForm, background_image: '' })}
+                      className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 cursor-pointer"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

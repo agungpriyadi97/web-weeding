@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getRSVPs, addRSVP } from '@/utils/db';
+import { getRSVPs, addRSVP, deleteRSVP } from '@/utils/db';
 
 export async function GET() {
   try {
@@ -19,6 +19,21 @@ export async function POST(request: Request) {
     }
     const rsvp = await addRSVP(body);
     return NextResponse.json(rsvp);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required.' }, { status: 400 });
+    }
+    const success = await deleteRSVP(id);
+    return NextResponse.json({ success });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
