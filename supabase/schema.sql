@@ -167,3 +167,84 @@ create policy "Allow admin read access to analytics_logs" on public.analytics_lo
 -- Enable real-time replication
 alter publication supabase_realtime add table public.rsvp;
 alter publication supabase_realtime add table public.guestbook;
+
+-- Create Love Story table
+create table if not exists public.love_story (
+    id uuid default uuid_generate_v4() primary key,
+    title text not null,
+    story_date text not null,
+    description text not null,
+    image_url text,
+    sort_order integer default 0 not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Create Events table
+create table if not exists public.events (
+    id uuid default uuid_generate_v4() primary key,
+    name text not null,
+    event_date date not null,
+    event_time text not null,
+    location text not null,
+    address text not null,
+    google_maps_url text not null,
+    sort_order integer default 0 not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Create WhatsApp Templates table
+create table if not exists public.whatsapp_templates (
+    id uuid default uuid_generate_v4() primary key,
+    name text not null,
+    template_text text not null,
+    is_default boolean default false not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Create Theme Settings table
+create table if not exists public.theme_settings (
+    id uuid default uuid_generate_v4() primary key,
+    gallery_layout text default 'grid' not null,
+    effect text default 'none' not null,
+    active_whatsapp_template_id uuid,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS policies for new tables
+alter table public.love_story enable row level security;
+alter table public.events enable row level security;
+alter table public.whatsapp_templates enable row level security;
+alter table public.theme_settings enable row level security;
+
+-- Policies for love_story
+create policy "Allow public read access to love_story" on public.love_story for select using (true);
+create policy "Allow admin write access to love_story" on public.love_story for all using (auth.role() = 'authenticated');
+
+-- Policies for events
+create policy "Allow public read access to events" on public.events for select using (true);
+create policy "Allow admin write access to events" on public.events for all using (auth.role() = 'authenticated');
+
+-- Policies for whatsapp_templates
+create policy "Allow public read access to whatsapp_templates" on public.whatsapp_templates for select using (true);
+create policy "Allow admin write access to whatsapp_templates" on public.whatsapp_templates for all using (auth.role() = 'authenticated');
+
+-- Policies for theme_settings
+create policy "Allow public read access to theme_settings" on public.theme_settings for select using (true);
+create policy "Allow admin write access to theme_settings" on public.theme_settings for all using (auth.role() = 'authenticated');
+
+-- Seed default entries
+insert into public.whatsapp_templates (name, template_text, is_default)
+values (
+    'Template Formal',
+    'Kepada Yth.\nBapak/Ibu/Saudara/i\n*{{GUEST_NAME}}*\n\n*Assalamualaikum Warahmatullahi Wabarakatuh*\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{{GROOM_NAME}} & {{BRIDE_NAME}}*\n\nDetail undangan dapat diakses melalui tautan berikut:\n{{INVITATION_URL}}\n\nMerupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir dan memberikan doa restu.\n\n*Wassalamualaikum Warahmatullahi Wabarakatuh*\n\nTerima kasih.',
+    true
+) on conflict do nothing;
+
+insert into public.theme_settings (gallery_layout, effect)
+values ('grid', 'none') on conflict do nothing;
+
+-- Add new tables to replication
+alter publication supabase_realtime add table public.events;
+alter publication supabase_realtime add table public.love_story;
+alter publication supabase_realtime add table public.theme_settings;
+

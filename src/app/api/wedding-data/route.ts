@@ -10,6 +10,14 @@ import {
   updateGiftAccounts, 
   getGuests, 
   updateGuests,
+  getEvents,
+  updateEvents,
+  getLoveStories,
+  updateLoveStories,
+  getThemeSettings,
+  updateThemeSettings,
+  getWhatsAppTemplates,
+  updateWhatsAppTemplates,
   syncLocalDbToMarkdown, 
   isSupabaseConfigured 
 } from '@/utils/db';
@@ -21,6 +29,10 @@ export async function GET() {
     const gallery = await getGallery();
     const giftAccounts = await getGiftAccounts();
     const guests = await getGuests();
+    const events = await getEvents();
+    const loveStories = await getLoveStories();
+    const themeSettings = await getThemeSettings();
+    const whatsappTemplates = await getWhatsAppTemplates();
 
     return NextResponse.json({
       info,
@@ -28,10 +40,14 @@ export async function GET() {
       parents,
       gallery,
       giftAccounts,
-      guests
+      guests,
+      events,
+      loveStories,
+      themeSettings,
+      whatsappTemplates
     });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
+  } catch (error: any) {
+    const message = error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -55,6 +71,18 @@ export async function POST(request: Request) {
     if (body.guests) {
       await updateGuests(body.guests);
     }
+    if (body.events) {
+      await updateEvents(body.events);
+    }
+    if (body.loveStories) {
+      await updateLoveStories(body.loveStories);
+    }
+    if (body.themeSettings) {
+      await updateThemeSettings(body.themeSettings);
+    }
+    if (body.whatsappTemplates) {
+      await updateWhatsAppTemplates(body.whatsappTemplates);
+    }
     
     // Sync to local markdown file if not using Supabase so local wedding-data.md stays updated
     if (!isSupabaseConfigured()) {
@@ -62,8 +90,9 @@ export async function POST(request: Request) {
     }
     
     return NextResponse.json({ success: true });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
+  } catch (error: any) {
+    const message = error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+

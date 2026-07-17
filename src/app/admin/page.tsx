@@ -26,10 +26,18 @@ import {
   Printer,
   Grid,
   X,
-  Music
+  Music,
+  MessageSquare
 } from 'lucide-react';
 import { WeddingData, RSVP, Guestbook, Guest, EventDetail, ParentDetail, GiftAccount, AnalyticsLog, MempelaiDetail } from '@/types/wedding';
 import { supabase } from '@/utils/supabaseClient';
+
+// Premium subcomponents
+import ThemeGallery from '@/components/admin/ThemeGallery';
+import LoveStoryManager from '@/components/admin/LoveStoryManager';
+import EventManager from '@/components/admin/EventManager';
+import WhatsAppTemplateManager from '@/components/admin/WhatsAppTemplateManager';
+
 
 export default function AdminDashboard() {
   // Auth state
@@ -39,7 +47,7 @@ export default function AdminDashboard() {
   const [loginError, setLoginError] = useState('');
 
   // App data states
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'info' | 'parents' | 'gallery' | 'gifts' | 'rsvps' | 'wishes' | 'guests' | 'theme' | 'settings' | 'music'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'info' | 'parents' | 'gallery' | 'gifts' | 'rsvps' | 'wishes' | 'guests' | 'theme' | 'settings' | 'music' | 'love_story' | 'events' | 'whatsapp'>('dashboard');
   const [loading, setLoading] = useState(true);
   const [weddingData, setWeddingData] = useState<WeddingData | null>(null);
   
@@ -695,12 +703,39 @@ export default function AdminDashboard() {
     }
   };
 
-  const copyGuestInviteLink = (slug: string, id: string) => {
+  const copyGuestInviteLink = (guest: Guest, id: string, type: 'copy_link' | 'copy_text' | 'whatsapp') => {
     if (typeof window !== 'undefined') {
-      const inviteUrl = `${window.location.protocol}//${window.location.host}/invite/${slug}`;
-      navigator.clipboard.writeText(inviteUrl);
-      setCopiedGuestId(id);
-      setTimeout(() => setCopiedGuestId(null), 2500);
+      const inviteUrl = `${window.location.protocol}//${window.location.host}/invite/${guest.slug}`;
+      if (type === 'copy_link') {
+        navigator.clipboard.writeText(inviteUrl);
+        setCopiedGuestId(`link-${id}`);
+        setTimeout(() => setCopiedGuestId(null), 2500);
+        return;
+      }
+
+      const groomNick = weddingData?.event?.groom_nickname || 'Hery';
+      const brideNick = weddingData?.event?.bride_nickname || 'Bella';
+      
+      const activeTemplate = weddingData?.whatsappTemplates?.find(t => t.id === weddingData?.themeSettings?.active_whatsapp_template_id) || 
+                             weddingData?.whatsappTemplates?.find(t => t.is_default) ||
+                             weddingData?.whatsappTemplates?.[0];
+      
+      let templateText = activeTemplate?.template_text || `Kepada Yth.\nBapak/Ibu/Saudara/i\n*{{GUEST_NAME}}*\n\n*Assalamualaikum Warahmatullahi Wabarakatuh*\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{{GROOM_NAME}} & {{BRIDE_NAME}}*\n\nDetail undangan dapat diakses melalui tautan berikut:\n{{INVITATION_URL}}\n\nMerupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir dan memberikan doa restu.\n\n*Wassalamualaikum Warahmatullahi Wabarakatuh*\n\nTerima kasih.`;
+      
+      templateText = templateText
+        .replace(/\{\{GUEST_NAME\}\}/g, guest.guest_name)
+        .replace(/\{\{GROOM_NAME\}\}/g, groomNick)
+        .replace(/\{\{BRIDE_NAME\}\}/g, brideNick)
+        .replace(/\{\{INVITATION_URL\}\}/g, inviteUrl);
+
+      if (type === 'copy_text') {
+        navigator.clipboard.writeText(templateText);
+        setCopiedGuestId(`text-${id}`);
+        setTimeout(() => setCopiedGuestId(null), 2500);
+      } else if (type === 'whatsapp') {
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(templateText)}`;
+        window.open(waUrl, '_blank');
+      }
     }
   };
 
@@ -909,7 +944,7 @@ export default function AdminDashboard() {
           </div>
 
           <nav className="flex flex-col gap-1">
-            {[
+            {([
               { id: 'dashboard', label: 'Dashboard', icon: Layers },
               { id: 'info', label: 'Wedding Info', icon: Calendar },
               { id: 'parents', label: 'Parents details', icon: Users },
@@ -918,15 +953,18 @@ export default function AdminDashboard() {
               { id: 'rsvps', label: 'RSVP Manager', icon: UserCheck },
               { id: 'wishes', label: 'Guestbook Wishes', icon: BookOpen },
               { id: 'guests', label: 'Guests Registry', icon: Users },
+              { id: 'love_story', label: 'Love Story Timeline', icon: Heart },
+              { id: 'events', label: 'Events List', icon: Calendar },
+              { id: 'whatsapp', label: 'WhatsApp Template', icon: MessageSquare },
               { id: 'music', label: 'Music Upload', icon: Music },
               { id: 'theme', label: 'Design & Themes', icon: Grid },
               { id: 'settings', label: 'Website Settings', icon: Settings },
-            ].map(tab => {
+            ] as const).map(tab => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as 'dashboard' | 'info' | 'parents' | 'gallery' | 'gifts' | 'rsvps' | 'wishes' | 'guests' | 'theme' | 'settings' | 'music')}
+                  onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                     activeTab === tab.id
                       ? 'bg-gold-50 text-gold-700 font-semibold border-l-4 border-gold-500'
@@ -1820,35 +1858,56 @@ export default function AdminDashboard() {
                             Edit
                           </button>
                         )}
-                        <button
+                         <button
                           onClick={() => {
                             if (typeof window !== 'undefined') {
                               const inviteUrl = `${window.location.protocol}//${window.location.host}/invite/${guest.slug}`;
-                              // Open a QR server rendering URL in a new window or show modal
                               setQrCodeModalUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(inviteUrl)}`);
                             }
                           }}
-                          className="px-2.5 py-1.5 border border-gold-200 rounded-lg text-xs font-semibold text-gold-500 hover:bg-gold-50/30 transition-colors cursor-pointer"
+                          className="px-2.5 py-1.5 border border-gold-250 rounded-lg text-xs font-bold text-gold-600 hover:bg-gold-50/40 cursor-pointer"
                           title="Generate QR Code"
                         >
                           QR
                         </button>
+
+                        {/* Copy Link */}
                         <button
-                          onClick={() => copyGuestInviteLink(guest.slug, guest.id || String(idx))}
-                          className="px-3.5 py-1.5 border border-gold-300 rounded-lg text-xs font-semibold text-gold-600 hover:bg-gold-50 inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                          onClick={() => copyGuestInviteLink(guest, guest.id || String(idx), 'copy_link')}
+                          className="px-2.5 py-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-500 hover:bg-gray-50 cursor-pointer inline-flex items-center gap-1"
+                          title="Copy Link Only"
                         >
-                          {copiedGuestId === (guest.id || String(idx)) ? (
-                            <>
-                              <Check className="w-3.5 h-3.5 text-green-600" />
-                              <span className="text-green-600">Copied</span>
-                            </>
+                          {copiedGuestId === `link-${guest.id || String(idx)}` ? (
+                            <Check className="w-3.5 h-3.5 text-green-600" />
                           ) : (
-                            <>
-                              <Copy className="w-3.5 h-3.5" />
-                              <span>Link</span>
-                            </>
+                            <Copy className="w-3.5 h-3.5" />
                           )}
+                          Link
                         </button>
+
+                        {/* Copy WA Message */}
+                        <button
+                          onClick={() => copyGuestInviteLink(guest, guest.id || String(idx), 'copy_text')}
+                          className="px-2.5 py-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-500 hover:bg-gray-50 cursor-pointer inline-flex items-center gap-1"
+                          title="Copy WhatsApp Text Message"
+                        >
+                          {copiedGuestId === `text-${guest.id || String(idx)}` ? (
+                            <Check className="w-3.5 h-3.5 text-green-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                          Text
+                        </button>
+
+                        {/* Share WA */}
+                        <button
+                          onClick={() => copyGuestInviteLink(guest, guest.id || String(idx), 'whatsapp')}
+                          className="px-2.5 py-1.5 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-lg text-xs font-bold cursor-pointer inline-flex items-center gap-1"
+                          title="Share directly via WhatsApp"
+                        >
+                          Share
+                        </button>
+
                         <button
                           onClick={() => handleDeleteGuestItem(guest.id || '')}
                           className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer"
@@ -1870,95 +1929,23 @@ export default function AdminDashboard() {
         )}
 
         {/* 9. RUNTIME DYNAMIC DESIGN THEME SELECTION */}
-        {activeTab === 'theme' && (
-          <form onSubmit={handleSaveInfo} className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-gold-100 shadow-sm">
-            <div>
-              <h2 className="text-2xl font-serif font-bold text-gold-800">Tema Desain Undangan</h2>
-              <p className="text-xs text-gray-400 mt-1">Ganti tema warna dan tipografi undangan digital tanpa perlu redeploy website.</p>
-            </div>
+        {activeTab === 'theme' && weddingData && (
+          <ThemeGallery weddingData={weddingData} loadData={loadData} />
+        )}
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-4">
-              {[
-                { key: 'elegant-gold', label: 'Elegant Gold', desc: 'Warna cream klasik dengan aksen emas.', previewColor: 'bg-[#FDFBF7] border-gold-300' },
-                { key: 'elegant-white', label: 'Elegant White', desc: 'Minimalis bersih dengan aksen abu-abu/hijau.', previewColor: 'bg-white border-gray-300' },
-                { key: 'minimalist', label: 'Minimalist', desc: 'Modern dengan layout clean & bold text.', previewColor: 'bg-[#FAFAFA] border-slate-300' },
-                { key: 'classic', label: 'Classic Maroon', desc: 'Sentuhan elegan merah marun dan krem.', previewColor: 'bg-[#FCF7ED] border-red-300' },
-                { key: 'dark', label: 'Luxurious Dark', desc: 'Background hitam mewah dengan teks emas menyala.', previewColor: 'bg-[#111111] border-gold-500' },
-                { key: 'luxury', label: 'Royal Navy', desc: 'Biru navy kerajaan dengan ornamen emas gemerlap.', previewColor: 'bg-[#070F2B] border-gold-400' },
-              ].map(theme => (
-                <div
-                  key={theme.key}
-                  onClick={() => setSelectedTheme(theme.key)}
-                  className={`p-5 rounded-2xl border cursor-pointer hover:scale-103 transition-all flex flex-col justify-between ${
-                    selectedTheme === theme.key
-                      ? 'border-gold-500 ring-2 ring-gold-200 bg-gold-50/5'
-                      : 'border-gold-100 bg-[#FDFCF9]/30 hover:border-gold-300'
-                  }`}
-                >
-                  <div className="flex flex-col gap-3">
-                    <div className={`w-12 h-6 rounded-md border ${theme.previewColor}`} />
-                    <span className="font-serif font-bold text-gray-800 text-sm">{theme.label}</span>
-                    <span className="text-[10px] text-gray-400 leading-relaxed">{theme.desc}</span>
-                  </div>
-                  
-                  {selectedTheme === theme.key && (
-                    <span className="text-[10px] font-bold text-gold-600 mt-4 flex items-center gap-1">
-                      ✓ Aktif
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
+        {/* 12. LOVE STORY TIMELINE MANAGER */}
+        {activeTab === 'love_story' && weddingData && (
+          <LoveStoryManager weddingData={weddingData} loadData={loadData} />
+        )}
 
-            <div className="mt-8 border-t border-gold-50 pt-6">
-              <h3 className="font-serif font-bold text-gray-800 text-sm mb-4">Custom Theme Colors</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-md">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Primary Color (Aksen)</label>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="color"
-                      value={infoForm.primary_color || '#C5A059'}
-                      onChange={(e) => setInfoForm({ ...infoForm, primary_color: e.target.value })}
-                      className="w-10 h-10 border border-gold-100 rounded cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      value={infoForm.primary_color || '#C5A059'}
-                      onChange={(e) => setInfoForm({ ...infoForm, primary_color: e.target.value })}
-                      className="flex-grow px-3 py-2 border border-gold-100 rounded-lg text-sm font-mono"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Secondary Color (Background)</label>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="color"
-                      value={infoForm.secondary_color || '#FDFBF7'}
-                      onChange={(e) => setInfoForm({ ...infoForm, secondary_color: e.target.value })}
-                      className="w-10 h-10 border border-gold-100 rounded cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      value={infoForm.secondary_color || '#FDFBF7'}
-                      onChange={(e) => setInfoForm({ ...infoForm, secondary_color: e.target.value })}
-                      className="flex-grow px-3 py-2 border border-gold-100 rounded-lg text-sm font-mono"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* 13. EVENTS LIST MANAGER */}
+        {activeTab === 'events' && weddingData && (
+          <EventManager weddingData={weddingData} loadData={loadData} />
+        )}
 
-            <div className="flex justify-end gap-3 mt-6 border-t border-gold-50 pt-6">
-              <button
-                type="submit"
-                className="px-6 py-2.5 rounded-xl gold-bg-gradient text-white text-xs font-bold uppercase tracking-wider shadow-md hover:opacity-90 flex items-center gap-2 cursor-pointer"
-              >
-                <Save className="w-3.5 h-3.5" /> Terapkan Tema
-              </button>
-            </div>
-          </form>
+        {/* 14. WHATSAPP TEMPLATE EDITOR */}
+        {activeTab === 'whatsapp' && weddingData && (
+          <WhatsAppTemplateManager weddingData={weddingData} loadData={loadData} />
         )}
 
         {/* 10. SYSTEM CONFIGURATION & WEB SETTINGS TOGGLES */}
@@ -2255,6 +2242,49 @@ export default function AdminDashboard() {
                 <p className="text-xs text-gray-400 text-center leading-relaxed">
                   Tamu dapat melakukan scan pada QR code ini untuk membuka link undangan digital personal mereka secara instan.
                 </p>
+
+                <button
+                  onClick={() => {
+                    const printWindow = window.open('', '_blank');
+                    if (printWindow) {
+                      const guestSlug = qrCodeModalUrl.split('data=')[1];
+                      const guestObj = weddingData?.guests?.find(g => encodeURIComponent(guestSlug).includes(encodeURIComponent(g.slug)));
+                      const guestNameStr = guestObj ? guestObj.guest_name : '';
+                      printWindow.document.write(`
+                        <html>
+                          <head>
+                            <title>QR Code - ${guestNameStr}</title>
+                            <style>
+                              body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: system-ui, sans-serif; text-align: center; margin: 0; }
+                              .container { border: 2px solid #C5A059; padding: 30px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+                              img { width: 250px; height: 250px; margin-top: 15px; }
+                              h2 { color: #8C6A24; margin: 0 0 10px 0; }
+                              p { color: #666; margin: 0; font-size: 14px; }
+                            </style>
+                          </head>
+                          <body>
+                            <div class="container">
+                              <h2>Undangan Pernikahan</h2>
+                              <p>Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+                              <h3 style="margin: 5px 0 15px 0;">${guestNameStr}</h3>
+                              <img src="${qrCodeModalUrl}" />
+                            </div>
+                            <script>
+                              window.onload = function() {
+                                window.print();
+                                window.close();
+                              }
+                            </script>
+                          </body>
+                        </html>
+                      `);
+                      printWindow.document.close();
+                    }
+                  }}
+                  className="w-full mt-4 py-2.5 bg-gold-500 hover:bg-gold-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider text-center cursor-pointer shadow-sm"
+                >
+                  Print QR Code
+                </button>
               </motion.div>
             </motion.div>
           )}

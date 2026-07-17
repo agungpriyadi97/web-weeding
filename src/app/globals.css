@@ -1,8 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
 @import "tailwindcss";
 
 @theme {
   --font-serif: var(--font-serif), Georgia, serif;
   --font-sans: var(--font-sans), system-ui, sans-serif;
+  --font-elegant-serif: 'Cormorant Garamond', serif;
+  --font-luxury-serif: 'Cinzel', serif;
+  --font-modern-sans: 'Montserrat', sans-serif;
+  --font-classic-script: 'Great Vibes', cursive;
+  --font-arabic-style: 'Amiri', serif;
+  --font-traditional-style: 'Cinzel Decorative', serif;
   --color-gold-50: #fbf8f0;
   --color-gold-100: #f5eed9;
   --color-gold-200: #eadcb4;

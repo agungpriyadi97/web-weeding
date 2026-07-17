@@ -118,6 +118,44 @@ export interface AnalyticsLog {
   created_at?: string;
 }
 
+export interface LoveStory {
+  id?: string;
+  title: string;
+  story_date: string;
+  description: string;
+  image_url?: string;
+  sort_order: number;
+  created_at?: string;
+}
+
+export interface WeddingEvent {
+  id?: string;
+  name: string;
+  event_date: string;
+  event_time: string;
+  location: string;
+  address: string;
+  google_maps_url: string;
+  sort_order: number;
+  created_at?: string;
+}
+
+export interface WhatsAppTemplate {
+  id?: string;
+  name: string;
+  template_text: string;
+  is_default: boolean;
+  created_at?: string;
+}
+
+export interface ThemeSettings {
+  id?: string;
+  gallery_layout: string;
+  effect: string;
+  active_whatsapp_template_id?: string;
+  created_at?: string;
+}
+
 // Aggregated type for markdown parser and client rendering
 export interface WeddingData {
   groom: MempelaiDetail;
@@ -128,4 +166,9 @@ export interface WeddingData {
   giftAccounts: GiftAccount[];
   guests: Guest[];
   closingMessage: string;
+  loveStories?: LoveStory[];
+  events?: WeddingEvent[];
+  whatsappTemplates?: WhatsAppTemplate[];
+  themeSettings?: ThemeSettings;
 }
+

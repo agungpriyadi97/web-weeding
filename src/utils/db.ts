@@ -1,5 +1,7 @@
+import { randomUUID } from 'crypto';
 import { getSupabaseAdmin } from './supabaseClient';
-import { EventDetail, ParentDetail, GalleryItem, GiftAccount, RSVP, Guestbook, Guest, AnalyticsLog } from '../types/wedding';
+import { EventDetail, ParentDetail, GalleryItem, GiftAccount, RSVP, Guestbook, Guest, AnalyticsLog, LoveStory, WeddingEvent, WhatsAppTemplate, ThemeSettings } from '../types/wedding';
+
 
 // Helper to get administrative client to bypass RLS policies
 const getDb = () => getSupabaseAdmin();
@@ -283,7 +285,7 @@ export async function updateGiftAccounts(accounts: GiftAccount[]): Promise<GiftA
   }
 
   const { data, error } = await db.from('gift_accounts').upsert(accounts.map(acc => ({
-    id: acc.id || undefined,
+    id: acc.id || randomUUID(),
     bank_name: acc.bank_name,
     account_number: acc.account_number,
     account_holder: acc.account_holder,
@@ -435,7 +437,7 @@ export async function updateGuests(guests: Guest[]): Promise<Guest[]> {
   }
 
   const { data, error } = await db.from('guests').upsert(guests.map(g => ({
-    id: g.id || undefined,
+    id: g.id || randomUUID(),
     guest_name: g.guest_name,
     slug: g.slug
   }))).select();
@@ -506,3 +508,191 @@ export async function addAnalyticsLog(log: Omit<AnalyticsLog, 'id' | 'created_at
   }
   return data;
 }
+
+// -------------------------------------------------------------
+// EVENTS
+// -------------------------------------------------------------
+export async function getEvents(): Promise<WeddingEvent[]> {
+  const db = getDb();
+  const { data, error } = await db.from('events').select('*').order('sort_order', { ascending: true });
+  if (error) {
+    console.error('Supabase getEvents error:', error.message);
+    return [];
+  }
+  return data || [];
+}
+
+export async function updateEvents(events: WeddingEvent[]): Promise<WeddingEvent[]> {
+  const db = getDb();
+  const existing = await getEvents();
+  
+  const activeIds = new Set(events.map(e => e.id).filter(Boolean));
+  const removed = existing.filter(e => !activeIds.has(e.id));
+  
+  for (const ev of removed) {
+    await db.from('events').delete().eq('id', ev.id);
+  }
+
+  const { data, error } = await db.from('events').upsert(events.map(ev => ({
+    id: ev.id || randomUUID(),
+    name: ev.name,
+    event_date: ev.event_date,
+    event_time: ev.event_time,
+    location: ev.location,
+    address: ev.address,
+    google_maps_url: ev.google_maps_url,
+    sort_order: ev.sort_order
+  }))).select();
+
+  if (error) {
+    console.error('Supabase updateEvents error:', error.message);
+    throw error;
+  }
+  return data || [];
+}
+
+// -------------------------------------------------------------
+// LOVE STORY
+// -------------------------------------------------------------
+export async function getLoveStories(): Promise<LoveStory[]> {
+  const db = getDb();
+  const { data, error } = await db.from('love_story').select('*').order('sort_order', { ascending: true });
+  if (error) {
+    console.error('Supabase getLoveStories error:', error.message);
+    return [];
+  }
+  return data || [];
+}
+
+export async function updateLoveStories(stories: LoveStory[]): Promise<LoveStory[]> {
+  const db = getDb();
+  const existing = await getLoveStories();
+  const supabaseAdmin = getDb();
+
+  // Find removed stories and delete image if exists
+  const activeIds = new Set(stories.map(s => s.id).filter(Boolean));
+  const removed = existing.filter(e => !activeIds.has(e.id));
+  
+  for (const story of removed) {
+    if (story.image_url) {
+      const storagePath = getStoragePathFromUrl(story.image_url, 'wedding-info');
+      if (storagePath) {
+        await supabaseAdmin.storage.from('wedding-info').remove([storagePath]);
+      }
+    }
+    await db.from('love_story').delete().eq('id', story.id);
+  }
+
+  // Handle updated story image cleanups if replaced
+  for (const story of stories) {
+    const exist = existing.find(e => e.id === story.id);
+    if (exist && story.image_url !== undefined && exist.image_url && exist.image_url !== story.image_url) {
+      const storagePath = getStoragePathFromUrl(exist.image_url, 'wedding-info');
+      if (storagePath) {
+        await supabaseAdmin.storage.from('wedding-info').remove([storagePath]);
+      }
+    }
+  }
+
+  const { data, error } = await db.from('love_story').upsert(stories.map(s => ({
+    id: s.id || randomUUID(),
+    title: s.title,
+    story_date: s.story_date,
+    description: s.description,
+    image_url: s.image_url,
+    sort_order: s.sort_order
+  }))).select();
+
+  if (error) {
+    console.error('Supabase updateLoveStories error:', error.message);
+    throw error;
+  }
+  return data || [];
+}
+
+// -------------------------------------------------------------
+// WHATSAPP TEMPLATES
+// -------------------------------------------------------------
+export async function getWhatsAppTemplates(): Promise<WhatsAppTemplate[]> {
+  const db = getDb();
+  const { data, error } = await db.from('whatsapp_templates').select('*').order('created_at', { ascending: true });
+  if (error) {
+    console.error('Supabase getWhatsAppTemplates error:', error.message);
+    return [];
+  }
+  return data || [];
+}
+
+export async function updateWhatsAppTemplates(templates: WhatsAppTemplate[]): Promise<WhatsAppTemplate[]> {
+  const db = getDb();
+  const existing = await getWhatsAppTemplates();
+  
+  const activeIds = new Set(templates.map(t => t.id).filter(Boolean));
+  const removed = existing.filter(e => !activeIds.has(e.id));
+  
+  for (const tpl of removed) {
+    await db.from('whatsapp_templates').delete().eq('id', tpl.id);
+  }
+
+  const { data, error } = await db.from('whatsapp_templates').upsert(templates.map(t => ({
+    id: t.id || randomUUID(),
+    name: t.name,
+    template_text: t.template_text,
+    is_default: t.is_default
+  }))).select();
+
+  if (error) {
+    console.error('Supabase updateWhatsAppTemplates error:', error.message);
+    throw error;
+  }
+  return data || [];
+}
+
+// -------------------------------------------------------------
+// THEME SETTINGS
+// -------------------------------------------------------------
+export async function getThemeSettings(): Promise<ThemeSettings> {
+  const db = getDb();
+  try {
+    const { data, error } = await db.from('theme_settings').select('*').limit(1).maybeSingle();
+    if (error) {
+      console.warn('Supabase getThemeSettings error (falling back to default):', error.message);
+      return {
+        gallery_layout: 'grid',
+        effect: 'none'
+      };
+    }
+    if (!data) {
+      const defaultSettings = {
+        gallery_layout: 'grid',
+        effect: 'none'
+      };
+      const { data: inserted, error: insertError } = await db.from('theme_settings').insert([defaultSettings]).select().single();
+      if (insertError) {
+        console.warn('Supabase default theme_settings insert error (falling back to default):', insertError.message);
+        return defaultSettings;
+      }
+      return inserted;
+    }
+    return data;
+  } catch (err) {
+    console.warn('Theme settings catch error (falling back to default settings):', err);
+    return {
+      gallery_layout: 'grid',
+      effect: 'none'
+    };
+  }
+}
+
+export async function updateThemeSettings(settings: Partial<ThemeSettings>): Promise<ThemeSettings> {
+  const db = getDb();
+  const existing = await getThemeSettings();
+  
+  const { data, error } = await db.from('theme_settings').update(settings).eq('id', existing.id).select().single();
+  if (error) {
+    console.error('Supabase updateThemeSettings error:', error.message);
+    throw error;
+  }
+  return data;
+}
+
