@@ -23,6 +23,7 @@ import MusicPlayer from './MusicPlayer';
 import PremiumEffects from './PremiumEffects';
 import { supabase } from '@/utils/supabaseClient';
 import { getThemeConfig } from '@/themes';
+import { getEventStatus, getNextEvent, getEventStartIsoString } from '@/utils/eventHelper';
 
 interface InvitationPageProps {
   initialData: WeddingData;
@@ -387,6 +388,9 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
         google_maps_url: initialData.event.google_maps,
         sort_order: 0
       }];
+
+  const nextEvent = getNextEvent(eventsList);
+  const countdownTarget = nextEvent ? getEventStartIsoString(nextEvent) : '';
 
   const showMusic = initialData.event.enable_music ?? true;
   const showCountdown = initialData.event.enable_countdown ?? true;
@@ -765,38 +769,69 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl">
-              {eventsList.map((ev, idx) => (
-                <motion.div
-                  key={ev.id || idx}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="flex flex-col items-center text-center p-8 rounded-2xl bg-white/40 border shadow-xs"
-                  style={{ borderColor: `${theme.colors.primary}15` }}
-                >
-                  <Clock className="w-8 h-8 mb-4" style={{ color: theme.colors.primary }} />
-                  <h3 className={`text-2xl font-bold`} style={{ color: theme.colors.primary }}>{ev.name}</h3>
-                  <div className="w-12 h-px my-3" style={{ backgroundColor: `${theme.colors.primary}30` }} />
-                  <p className="text-sm font-bold">{formatIndoDate(ev.event_date)}</p>
-                  <p className="text-xs opacity-75 mt-1">{ev.event_time}</p>
-                  <p className="text-xs font-semibold mt-4">{ev.location}</p>
-                  <p className="text-[11px] opacity-75 leading-relaxed mt-1">{ev.address}</p>
+              {eventsList.map((ev, idx) => {
+                const status = getEventStatus(ev);
+                const isNext = nextEvent && eventsList.indexOf(nextEvent) === idx;
+                
+                let highlightClass = "bg-white/40";
+                if (isNext) {
+                  highlightClass = "bg-gold-50/15 ring-2 ring-gold-500/80 scale-[1.02] relative";
+                } else if (status === 'Finished') {
+                  highlightClass = "bg-white/20 opacity-55 saturate-[40%]";
+                }
 
-                  <div className="mt-6 flex flex-wrap gap-2 justify-center">
-                    <a
-                      href={getGoogleCalendarUrl(ev.name, ev.event_date, ev.event_time, ev.location, ev.address)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-full text-white font-bold text-[10px] tracking-wider uppercase inline-flex items-center gap-1.5 transition-all shadow-xs"
-                      style={{ backgroundColor: theme.colors.primary }}
-                    >
-                      <CalendarIcon className="w-3 h-3" />
-                      Simpan Kalender
-                    </a>
-                  </div>
-                </motion.div>
-              ))}
+                return (
+                  <motion.div
+                    key={ev.id || idx}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className={`flex flex-col items-center text-center p-8 rounded-2xl border shadow-xs transition-all ${highlightClass}`}
+                    style={{ borderColor: isNext ? theme.colors.primary : `${theme.colors.primary}20` }}
+                  >
+                    {/* Status Badge */}
+                    {status === 'Finished' && (
+                      <span className="px-3 py-0.5 bg-red-50 border border-red-200 text-red-600 font-bold rounded-full text-[9px] uppercase tracking-wider mb-3">
+                        Telah Berlangsung
+                      </span>
+                    )}
+                    {status === 'Today' && (
+                      <span className="px-3 py-0.5 bg-green-50 border border-green-200 text-green-700 font-bold rounded-full text-[9px] uppercase tracking-wider mb-3 animate-pulse">
+                        Hari Ini
+                      </span>
+                    )}
+                    {isNext && status === 'Upcoming' && (
+                      <span className="px-3 py-0.5 bg-gold-50 border border-gold-300 text-gold-700 font-bold rounded-full text-[9px] uppercase tracking-wider mb-3 animate-pulse">
+                        Acara Berikutnya
+                      </span>
+                    )}
+
+                    <Clock className="w-8 h-8 mb-4" style={{ color: theme.colors.primary }} />
+                    <h3 className="text-2xl font-bold" style={{ color: theme.colors.primary }}>{ev.name}</h3>
+                    <div className="w-12 h-px my-3" style={{ backgroundColor: `${theme.colors.primary}30` }} />
+                    <p className="text-sm font-bold">{formatIndoDate(ev.event_date)}</p>
+                    <p className="text-xs opacity-75 mt-1">{ev.event_time}</p>
+                    <p className="text-xs font-semibold mt-4">{ev.location}</p>
+                    <p className="text-[11px] opacity-75 leading-relaxed mt-1">{ev.address}</p>
+
+                    {status !== 'Finished' && (
+                      <div className="mt-6 flex flex-wrap gap-2 justify-center">
+                        <a
+                          href={getGoogleCalendarUrl(ev.name, ev.event_date, ev.event_time, ev.location, ev.address)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2 rounded-full text-white font-bold text-[10px] tracking-wider uppercase inline-flex items-center gap-1.5 transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
+                          style={{ backgroundColor: theme.colors.primary }}
+                        >
+                          <CalendarIcon className="w-3 h-3" />
+                          Simpan Kalender
+                        </a>
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
           </section>
 
@@ -809,8 +844,18 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
                 viewport={{ once: true }}
                 className="w-full"
               >
-                <span className="text-[10px] tracking-widest uppercase font-bold opacity-60">Hari Bahagia Kami Akan Tiba Dalam:</span>
-                <Countdown targetDate={initialData.event.event_date} />
+                {nextEvent ? (
+                  <>
+                    <span className="text-[10px] tracking-widest uppercase font-bold opacity-60">
+                      {nextEvent.name} Akan Tiba Dalam:
+                    </span>
+                    <Countdown targetDate={countdownTarget} />
+                  </>
+                ) : (
+                  <div className="text-xl sm:text-2xl font-serif text-gold-600 font-bold tracking-wide py-6">
+                    Hari Bahagia Telah Tiba! 🎉
+                  </div>
+                )}
               </motion.div>
             </section>
           )}
@@ -827,45 +872,49 @@ export default function InvitationPage({ initialData, guestName, previewThemeId 
               <div className="w-16 h-0.5 mx-auto mt-4" style={{ backgroundColor: theme.colors.primary }} />
             </motion.div>
 
-            {eventsList[0] && (
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="w-full max-w-2xl bg-white/30 border p-6 rounded-3xl flex flex-col items-center shadow-xs"
-                style={{ borderColor: `${theme.colors.primary}15` }}
-              >
-                <MapPin className="w-8 h-8 mb-4 animate-bounce" style={{ color: theme.colors.primary }} />
-                <h4 className="text-xl font-bold text-center">{eventsList[0].location}</h4>
-                <p className="text-xs text-center opacity-75 mt-1 leading-relaxed max-w-md">{eventsList[0].address}</p>
+            {(() => {
+              const mapEvent = nextEvent || eventsList[0];
+              if (!mapEvent) return null;
+              return (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="w-full max-w-2xl bg-white/30 border p-6 rounded-3xl flex flex-col items-center shadow-xs"
+                  style={{ borderColor: `${theme.colors.primary}15` }}
+                >
+                  <MapPin className="w-8 h-8 mb-4 animate-bounce" style={{ color: theme.colors.primary }} />
+                  <h4 className="text-xl font-bold text-center">{mapEvent.location}</h4>
+                  <p className="text-xs text-center opacity-75 mt-1 leading-relaxed max-w-md">{mapEvent.address}</p>
 
-                {eventsList[0].google_maps_url && (
-                  <div className="mt-6 w-full flex flex-col items-center">
-                    {/* Maps embedded iframe fallback */}
-                    <div className="w-full h-64 rounded-2xl overflow-hidden border shadow-sm mb-4">
-                      <iframe 
-                        src={`https://maps.google.com/maps?q=${encodeURIComponent(eventsList[0].location + " " + eventsList[0].address)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
-                        width="100%" 
-                        height="100%" 
-                        style={{ border: 0 }} 
-                        allowFullScreen 
-                        loading="lazy"
-                      />
+                  {mapEvent.google_maps_url && (
+                    <div className="mt-6 w-full flex flex-col items-center">
+                      {/* Maps embedded iframe fallback */}
+                      <div className="w-full h-64 rounded-2xl overflow-hidden border shadow-sm mb-4">
+                        <iframe 
+                          src={`https://maps.google.com/maps?q=${encodeURIComponent(mapEvent.location + " " + mapEvent.address)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                          width="100%" 
+                          height="100%" 
+                          style={{ border: 0 }} 
+                          allowFullScreen 
+                          loading="lazy"
+                        />
+                      </div>
+                      <a
+                        href={mapEvent.google_maps_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-6 py-2.5 rounded-full font-bold text-xs tracking-wider uppercase transition-colors inline-flex items-center gap-2 cursor-pointer border"
+                        style={{ borderColor: theme.colors.primary, color: theme.colors.primary }}
+                      >
+                        <MapPin className="w-3.5 h-3.5" />
+                        Buka di Google Maps
+                      </a>
                     </div>
-                    <a
-                      href={eventsList[0].google_maps_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-6 py-2.5 rounded-full font-bold text-xs tracking-wider uppercase transition-colors inline-flex items-center gap-2 cursor-pointer border"
-                      style={{ borderColor: theme.colors.primary, color: theme.colors.primary }}
-                    >
-                      <MapPin className="w-3.5 h-3.5" />
-                      Buka di Google Maps
-                    </a>
-                  </div>
-                )}
-              </motion.div>
-            )}
+                  )}
+                </motion.div>
+              );
+            })()}
           </section>
 
           {/* 9. PREMIUM GALLERY */}

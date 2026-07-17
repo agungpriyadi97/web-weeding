@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { WeddingData, WeddingEvent } from '@/types/wedding';
 import { Trash2, Edit3, Check, Calendar, MapPin, Clock, ArrowUp, ArrowDown } from 'lucide-react';
+import { getEventStatus } from '@/utils/eventHelper';
 
 interface EventManagerProps {
   weddingData: WeddingData;
@@ -269,18 +270,35 @@ export default function EventManager({ weddingData, loadData }: EventManagerProp
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            {events.map((ev, idx) => (
-              <div
-                key={ev.id || idx}
-                className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center"
-              >
-                <div className="flex-grow flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-gray-800 text-base">{ev.name}</h4>
-                    <span className="px-2 py-0.5 bg-gold-50 border border-gold-200 text-gold-700 font-bold rounded-full text-[9px] uppercase tracking-wider">
-                      Urutan #{idx + 1}
-                    </span>
-                  </div>
+            {events.map((ev, idx) => {
+              const status = getEventStatus(ev);
+              return (
+                <div
+                  key={ev.id || idx}
+                  className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center"
+                >
+                  <div className="flex-grow flex flex-col gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="font-bold text-gray-800 text-base">{ev.name}</h4>
+                      <span className="px-2 py-0.5 bg-gold-50 border border-gold-200 text-gold-700 font-bold rounded-full text-[9px] uppercase tracking-wider">
+                        Urutan #{idx + 1}
+                      </span>
+                      {status === 'Finished' && (
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-500 border border-gray-200 font-bold rounded-full text-[9px] uppercase tracking-wider font-sans">
+                          Finished
+                        </span>
+                      )}
+                      {status === 'Today' && (
+                        <span className="px-2 py-0.5 bg-green-50 text-green-700 border border-green-200 font-bold rounded-full text-[9px] uppercase tracking-wider animate-pulse font-sans">
+                          Today
+                        </span>
+                      )}
+                      {status === 'Upcoming' && (
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 font-bold rounded-full text-[9px] uppercase tracking-wider font-sans">
+                          Upcoming
+                        </span>
+                      )}
+                    </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-500 mt-1">
                     <span className="flex items-center gap-1.5">
@@ -332,7 +350,8 @@ export default function EventManager({ weddingData, loadData }: EventManagerProp
                   </button>
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         )}
       </div>
